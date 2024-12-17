@@ -17,11 +17,11 @@ import {
 import * as Clipboard from 'expo-clipboard';
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyCcruItc8pcgZDt86havWvULJ4lTStuIV0',
-  authDomain: 'hairmax-386c3.firebaseapp.com',
-  databaseURL: 'https://hairmax-386c3-default-rtdb.firebaseio.com',
+  apiKey: process.env.FIREBASE_API_KEY,
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+  databaseURL: process.env.FIREBASE_DATABASE_URL,
   storageBucket: 'gs://hairmax-386c3.firebasestorage.app',
-  messagingSenderId: '91669462935',
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
 };
 
 // Editing this file with fast refresh will reinitialize the app on every refresh, let's not do that
