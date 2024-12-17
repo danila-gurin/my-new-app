@@ -24,13 +24,17 @@ const AuthScreen = () => {
     <View
       style={[
         styles.container,
-        { paddingTop: insets.top + 40, paddingBottom: insets.bottom },
+        {
+          paddingTop: insets.top + 40,
+          paddingBottom: insets.bottom,
+          backgroundColor: '#080815',
+        },
       ]}
     >
       <View style={styles.headingContainer}>
-        <Text style={styles.label}>Login on Dev Inteprid</Text>
+        <Text style={styles.label}>Login on Hairmax AI</Text>
         <Text style={styles.description}>
-          Start your journey with thousands of developers around the world.
+          Start your journey to improving your hair.
         </Text>
       </View>
 
@@ -58,6 +62,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 20,
+    color: 'white',
     fontWeight: 'bold',
   },
   description: {

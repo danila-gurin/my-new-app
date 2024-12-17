@@ -89,23 +89,27 @@ export default RadioButtonInput;
 const styles = StyleSheet.create({
   container: {
     width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 100,
     gap: 5,
   },
   label: {
-    fontSize: 13,
-    fontWeight: '500',
+    fontSize: 20,
+    fontWeight: 'bold',
   },
   optionsContainer: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     gap: 10,
     marginTop: 5,
   },
   option: {
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: 'gray',
-    borderRadius: 10,
-    padding: 7,
-    paddingHorizontal: 20,
+    borderRadius: 30,
+    padding: 17,
+    paddingHorizontal: 130,
+    alignItems: 'center',
   },
   optionText: {
     fontSize: 14,

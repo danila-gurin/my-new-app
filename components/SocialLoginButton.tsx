@@ -52,7 +52,7 @@ const SocialLoginButton = ({
     } else if (strategy === 'google') {
       return <Ionicons name="logo-google" size={24} color="#DB4437" />;
     } else if (strategy === 'apple') {
-      return <Ionicons name="logo-apple" size={24} color="black" />;
+      return <Ionicons name="logo-apple" size={24} color="white" />;
     }
   };
 
@@ -108,11 +108,13 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     flexDirection: 'row',
+
     gap: 10,
     justifyContent: 'space-between',
     alignItems: 'center',
   },
   buttonText: {
+    color: 'white',
     fontSize: 15,
     fontWeight: 'medium',
   },

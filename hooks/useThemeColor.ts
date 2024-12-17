@@ -1,21 +1,21 @@
+import { useEffect, useState } from 'react';
+import { useColorScheme as useRNColorScheme } from 'react-native';
+
 /**
- * Learn more about light and dark modes:
- * https://docs.expo.dev/guides/color-schemes/
+ * To support static rendering, this value needs to be re-calculated on the client side for web
  */
+export function useColorScheme() {
+  const [hasHydrated, setHasHydrated] = useState(false);
 
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+  useEffect(() => {
+    setHasHydrated(true);
+  }, []);
 
-export function useThemeColor(
-  props: { light?: string; dark?: string },
-  colorName: keyof typeof Colors.light & keyof typeof Colors.dark
-) {
-  const theme = useColorScheme() ?? 'light';
-  const colorFromProps = props[theme];
+  const colorScheme = useRNColorScheme();
 
-  if (colorFromProps) {
-    return colorFromProps;
-  } else {
-    return Colors[theme][colorName];
+  if (hasHydrated) {
+    return colorScheme;
   }
+
+  return 'light';
 }

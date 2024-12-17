@@ -17,7 +17,7 @@ export default function TabLayout() {
   }
 
   if (isSignedIn && user?.unsafeMetadata?.onboarding_completed !== true) {
-    return <Redirect href="/auth/complete-your-account" />;
+    return <Redirect href="/auth" />;
   }
 
   const { cameraActive } = useCameraContext();
