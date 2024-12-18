@@ -7,15 +7,30 @@ import {
   View,
   Keyboard,
   TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  Platform,
+  Animated,
+  Dimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'expo-router';
 import { useUser } from '@clerk/clerk-expo';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import ProgressLineWithCircles from '@/components/ProgressBarWithCircles';
 import React from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
+import {
+  addDoc,
+  collection,
+  doc,
+  getDocs,
+  query,
+  setDoc,
+  where,
+} from 'firebase/firestore';
+import { db } from '@/firebase';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ReferralScreen = () => {
   const { user, isLoaded } = useUser();
@@ -24,35 +39,126 @@ const ReferralScreen = () => {
   const [referralCode, setReferralCode] = useState('');
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const inputRef = useRef<TextInput>(null);
 
-  const { control, handleSubmit, setValue } = useForm({
+  // Animation value for button container
+  const buttonAnimation = useRef(new Animated.Value(0)).current;
+
+  const { control, handleSubmit, setValue, watch } = useForm({
     defaultValues: {
-      gender: '',
+      referral: '',
     },
   });
 
-  // Submit Handler
+  const referralCodeTemp = watch('referral');
+
+  useEffect(() => {
+    setReferralCode(referralCodeTemp); // Update the referralCode state
+    setIsReferralComplete(referralCodeTemp.trim() !== ''); // Set isReferralComplete based on the code
+  }, [referralCodeTemp]);
+
+  async function getTempId() {
+    try {
+      let tempId = await AsyncStorage.getItem('tempId');
+      if (!tempId) {
+        tempId = uuidv4(); // Generate a new UUID
+        await AsyncStorage.setItem('tempId', tempId || '');
+      }
+      return tempId;
+    } catch (error) {
+      console.error('Error with AsyncStorage:', error);
+      throw error;
+    }
+  }
+
+  // Keyboard animation handlers
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener(
+      'keyboardWillShow',
+      (event) => {
+        Animated.timing(buttonAnimation, {
+          toValue: -event.endCoordinates.height + insets.bottom,
+          duration: event.duration,
+          useNativeDriver: true,
+        }).start();
+      }
+    );
+
+    const hideSubscription = Keyboard.addListener(
+      'keyboardWillHide',
+      (event) => {
+        Animated.timing(buttonAnimation, {
+          toValue: 0,
+          duration: event.duration,
+          useNativeDriver: true,
+        }).start();
+      }
+    );
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
+
+  // Auto-focus input when component mounts
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      inputRef.current?.focus();
+    }, 100);
+    return () => clearTimeout(timeout);
+  }, []);
+
   const onSubmit = async (data: any) => {
-    const { gender } = data;
+    const { referral } = data;
+    const tempId = await getTempId();
+
+    async function addDocument() {
+      console.log('Starting to add document...'); // Add this
+      try {
+        const userQuery = query(
+          collection(db, 'users'),
+          where('tempId', '==', tempId)
+        );
+        const querySnapshot = await getDocs(userQuery);
+        if (!querySnapshot.empty) {
+          // Update the existing document
+          const docId = querySnapshot.docs[0].id; // Get the document ID
+          const userRef = doc(db, 'users', docId);
+
+          await setDoc(
+            userRef,
+            {
+              referral: referral, // Merge referral data
+            },
+            { merge: true } // Ensure the update doesn't overwrite existing data
+          );
+        } else {
+          // Create a new document if none exists
+          await addDoc(collection(db, 'users'), {
+            tempId: tempId,
+            referral: referral,
+          });
+        }
+      } catch (e) {
+        console.error('Error adding document: ', e);
+      }
+    }
+
+    addDocument();
 
     try {
       setIsLoading(true);
-
-      // Set the referral complete state if a code is entered
-
-      // Update user's metadata with gender and onboarding flag
       await user?.update({
         unsafeMetadata: {
           gender_chosen: true,
-          referral_complete: true, // Use the updated state here
+          referral_complete: true,
           chosen_age: false,
           onboarding_completed: false,
         },
       });
 
       await user?.reload();
-
-      // Navigate to main app
       router.push('/auth/age');
     } catch (error: any) {
       console.error('Error updating user:', error);
@@ -61,52 +167,56 @@ const ReferralScreen = () => {
     }
   };
 
-  // Sync user data to form when loaded
-  useEffect(() => {
-    if (isLoaded && user) {
-      const existingGender = String(user?.unsafeMetadata?.gender) || '';
-      if (existingGender) {
-        setValue('gender', existingGender);
-      }
-    }
-  }, [isLoaded, user, setValue]);
   useEffect(() => {
     setIsReferralComplete(referralCode.trim() !== '');
   }, [referralCode]);
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View
-        style={[
-          styles.container,
-          {
-            paddingTop: insets.top + 40,
-            paddingBottom: insets.bottom,
-            backgroundColor: '#080815',
-          },
-        ]}
-      >
-        {/* Heading Section */}
-        <View style={styles.headingContainer}>
-          <ProgressLineWithCircles currentStep={2} />
-          <Text style={styles.label}>Do you have{'\n'}a referral code?</Text>
-        </View>
+    <View style={styles.keyboardAvoidingView}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View
+          style={[
+            styles.container,
+            {
+              paddingTop: insets.top + 40,
+              backgroundColor: '#080815',
+            },
+          ]}
+        >
+          {/* Fixed Header Section */}
+          <View style={styles.headerSection}>
+            <View style={styles.headingContainer}>
+              <ProgressLineWithCircles currentStep={2} />
+              <Text style={styles.label}>
+                Do you have{'\n'}a referral code?
+              </Text>
+            </View>
 
-        {/* Form Section */}
-        <View style={styles.formContainer}>
-          <TextInput
-            placeholder="Ex. qwa8re4"
-            placeholderTextColor="gray"
-            style={styles.input}
-            value={referralCode}
-            onChangeText={setReferralCode}
-          />
-          <Text style={styles.description}>
-            Enter your code here, or continue to skip
-          </Text>
+            <View style={styles.inputContainer}>
+              <TextInput
+                ref={inputRef}
+                placeholder="Ex. qwa8re4"
+                placeholderTextColor="gray"
+                style={styles.input}
+                value={referralCodeTemp}
+                onChangeText={(text) => setValue('referral', text)}
+                autoFocus={true}
+              />
+              <Text style={styles.description}>
+                Enter your code here, or continue to skip
+              </Text>
+            </View>
+          </View>
 
-          {/* Submit Button */}
-          <View style={{ marginTop: 20 }}>
+          {/* Animated Button Section */}
+          <Animated.View
+            style={[
+              styles.buttonContainer,
+              {
+                transform: [{ translateY: buttonAnimation }],
+              },
+            ]}
+          >
             <TouchableOpacity
               style={[styles.button, { opacity: isLoading ? 0.7 : 1 }]}
               onPress={handleSubmit(onSubmit)}
@@ -114,54 +224,63 @@ const ReferralScreen = () => {
             >
               {isLoading ? (
                 <ActivityIndicator size="small" color="white" />
-              ) : null}
-              <LinearGradient
-                colors={[
-                  'rgba(2,0,36,1)',
-                  'rgba(9,9,121,1)',
-                  'rgba(0,212,255,1)',
-                ]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={[
-                  styles.button,
-                  {
-                    borderWidth: 1,
-                    borderTopColor: '#4485ff',
-                    borderLeftColor: '#4485ff',
-                    borderRightColor: '#4485ff',
-                    borderBottomColor: '#97cbf7',
-                  },
-                ]}
-              >
-                <Text style={styles.buttonText}>
-                  {isReferralComplete ? 'Continue' : 'Skip'}
-                </Text>
-              </LinearGradient>
+              ) : (
+                <LinearGradient
+                  colors={[
+                    'rgba(2,0,36,1)',
+                    'rgba(9,9,121,1)',
+                    'rgba(0,212,255,1)',
+                  ]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={[
+                    styles.button,
+                    {
+                      borderWidth: 1,
+                      borderTopColor: '#4485ff',
+                      borderLeftColor: '#4485ff',
+                      borderRightColor: '#4485ff',
+                      borderBottomColor: '#97cbf7',
+                    },
+                  ]}
+                >
+                  <Text style={styles.buttonText}>
+                    {isReferralComplete ? 'Continue' : 'Skip'}
+                  </Text>
+                </LinearGradient>
+              )}
             </TouchableOpacity>
-          </View>
+          </Animated.View>
         </View>
-      </View>
-    </TouchableWithoutFeedback>
+      </TouchableWithoutFeedback>
+    </View>
   );
 };
 
 export default ReferralScreen;
 
 const styles = StyleSheet.create({
+  keyboardAvoidingView: {
+    flex: 1,
+    backgroundColor: '#080815',
+  },
   container: {
     flex: 1,
-    backgroundColor: 'white',
     padding: 20,
-    gap: 20,
+  },
+  headerSection: {
+    gap: 40,
   },
   headingContainer: {
     width: '100%',
     gap: 5,
   },
+  inputContainer: {
+    width: '100%',
+    gap: 8,
+  },
   input: {
     height: 65,
-    margin: 12,
     borderWidth: 1,
     borderRadius: 10,
     padding: 12,
@@ -178,20 +297,18 @@ const styles = StyleSheet.create({
     color: 'white',
     alignSelf: 'center',
   },
-  formContainer: {
-    width: '100%',
-    marginTop: 130,
-    gap: 20,
+  buttonContainer: {
+    position: 'absolute',
+    bottom: 40,
+    left: 20,
+    right: 20,
   },
   button: {
     padding: 20,
     borderRadius: 30,
-    marginTop: 50,
-    borderColor: 'white',
-
     alignItems: 'center',
     justifyContent: 'center',
-    width: '100%', // Ensures the button spans the available width
+    width: '100%',
   },
   buttonText: {
     color: 'white',
@@ -199,3 +316,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
 });
+function uuidv4(): string | null {
+  throw new Error('Function not implemented.');
+}

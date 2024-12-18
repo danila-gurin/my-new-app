@@ -139,20 +139,23 @@ const NotificationScreen = () => {
 
         {/* Circle with Bell */}
         <View style={styles.circleContainer}>
-          <View style={styles.circle}>
-            <Image
-              source={require('@/constants/bell-removebg-preview.png')}
-              style={styles.bellImage}
-              resizeMode="contain"
-            />
-          </View>
+          <TouchableOpacity onPress={handleNotificationSetup}>
+            {' '}
+            {/* Added onPress here */}
+            <View style={styles.circle}>
+              <Image
+                source={require('@/constants/bell-removebg-preview.png')}
+                style={styles.bellImage}
+                resizeMode="contain"
+              />
+            </View>
+          </TouchableOpacity>
         </View>
 
         {/* Submit Button */}
         <View style={{ marginTop: 20 }}>
           <TouchableOpacity
             style={[styles.button, { opacity: isLoading ? 0.7 : 1 }]}
-            onPress={handleNotificationSetup} // Trigger notification permission
             disabled={isLoading}
           >
             {isLoading ? (

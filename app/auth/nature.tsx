@@ -17,12 +17,23 @@ import { useEffect, useState } from 'react';
 import ProgressLineWithCircles from '@/components/ProgressBarWithCircles';
 import React from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  addDoc,
+  collection,
+  doc,
+  getDocs,
+  query,
+  setDoc,
+  where,
+} from 'firebase/firestore';
+import { db } from '@/firebase';
 
 const NatureScreen = () => {
   const { user, isLoaded } = useUser();
   const [isLoading, setIsLoading] = useState(false);
 
-  // Change selected options state to a single string
+  // State for selected option
   const [selectedOption, setSelectedOption] = useState<string>('');
 
   const router = useRouter();
@@ -30,13 +41,62 @@ const NatureScreen = () => {
 
   const { control, handleSubmit, setValue } = useForm({
     defaultValues: {
-      gender: '',
+      scalpNature: '',
     },
   });
 
+  async function getTempId() {
+    try {
+      let tempId = await AsyncStorage.getItem('tempId');
+      if (!tempId) {
+        tempId = uuidv4(); // Generate a new UUID
+        await AsyncStorage.setItem('tempId', tempId || '');
+      }
+      return tempId;
+    } catch (error) {
+      console.error('Error with AsyncStorage:', error);
+      throw error;
+    }
+  }
+
   // Submit Handler
   const onSubmit = async (data: any) => {
-    const { gender } = data;
+    const { scalpNature } = data;
+    const tempId = await getTempId();
+
+    async function addDocument() {
+      console.log('Starting to add document...');
+      try {
+        const userQuery = query(
+          collection(db, 'users'),
+          where('tempId', '==', tempId)
+        );
+        const querySnapshot = await getDocs(userQuery);
+        if (!querySnapshot.empty) {
+          // Update the existing document
+          const docId = querySnapshot.docs[0].id;
+          const userRef = doc(db, 'users', docId);
+
+          await setDoc(
+            userRef,
+            {
+              scalpNature: selectedOption, // Store the selected option
+            },
+            { merge: true }
+          );
+        } else {
+          // Create a new document if none exists
+          await addDoc(collection(db, 'users'), {
+            tempId: tempId,
+            scalpNature: selectedOption,
+          });
+        }
+      } catch (e) {
+        console.error('Error adding document: ', e);
+      }
+    }
+
+    addDocument();
 
     try {
       setIsLoading(true);
@@ -45,12 +105,12 @@ const NatureScreen = () => {
       await user?.update({
         unsafeMetadata: {
           gender_chosen: true,
-          referral_complete: true, // Use the updated state here
+          referral_complete: true,
           chosen_age: true,
           chosen_improvement: true,
           chosen_hair: true,
           chosen_history: true,
-          chosen_nature: true,
+          chosen_nature: true, // Ensure "chosen_nature" is updated
           chosen_notifications: false,
           onboarding_completed: false,
         },
@@ -67,19 +127,9 @@ const NatureScreen = () => {
     }
   };
 
-  // Sync user data to form when loaded
-  useEffect(() => {
-    if (isLoaded && user) {
-      const existingGender = String(user?.unsafeMetadata?.gender) || '';
-      if (existingGender) {
-        setValue('gender', existingGender);
-      }
-    }
-  }, [isLoaded, user, setValue]);
-
   // Handler for selecting an option (only allows one option)
   const handleOptionSelect = (option: string) => {
-    setSelectedOption(option); // Set the selected option to only one value
+    setSelectedOption(option); // Update state with the selected option
   };
 
   return (
@@ -108,23 +158,23 @@ const NatureScreen = () => {
               {
                 opacity: isLoading ? 0.7 : 1,
                 backgroundColor:
-                  selectedOption === 'extreme' ? '#4485ff' : '#141a2a',
-                flexDirection: 'row', // Align text and icon horizontally
-                justifyContent: 'space-between', // Keep text left, icon right
-                alignItems: 'center', // Center vertically
-                height: 64, // Explicitly define button height to prevent "fat" buttons
-                paddingHorizontal: 20, // Add horizontal padding without changing height
+                  selectedOption === 'Dry' ? '#4485ff' : '#141a2a',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                height: 64,
+                paddingHorizontal: 20,
               },
             ]}
             disabled={isLoading}
-            onPress={() => handleOptionSelect('extreme')}
+            onPress={() => handleOptionSelect('dry')}
           >
             <Text style={styles.radioButtonText}>Dry</Text>
             <Ionicons
               name="checkmark-circle-outline"
               size={24}
-              color="#A9A9A9" // Set gray color
-              style={{ flexShrink: 0 }} // Prevent icon from resizing
+              color="#A9A9A9"
+              style={{ flexShrink: 0 }}
             />
           </TouchableOpacity>
           <TouchableOpacity
@@ -133,23 +183,23 @@ const NatureScreen = () => {
               {
                 opacity: isLoading ? 0.7 : 1,
                 backgroundColor:
-                  selectedOption === 'moderate' ? '#4485ff' : '#141a2a',
-                flexDirection: 'row', // Align text and icon horizontally
-                justifyContent: 'space-between', // Keep text left, icon right
-                alignItems: 'center', // Center vertically
-                height: 64, // Explicitly define button height to prevent "fat" buttons
-                paddingHorizontal: 20, // Add horizontal padding without changing height
+                  selectedOption === 'Normal' ? '#4485ff' : '#141a2a',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                height: 64,
+                paddingHorizontal: 20,
               },
             ]}
             disabled={isLoading}
-            onPress={() => handleOptionSelect('moderate')}
+            onPress={() => handleOptionSelect('Normal')}
           >
             <Text style={styles.radioButtonText}>Normal</Text>
             <Ionicons
               name="checkmark-circle-outline"
               size={24}
-              color="#A9A9A9" // Set gray color
-              style={{ flexShrink: 0 }} // Prevent icon from resizing
+              color="#A9A9A9"
+              style={{ flexShrink: 0 }}
             />
           </TouchableOpacity>
           <TouchableOpacity
@@ -158,23 +208,23 @@ const NatureScreen = () => {
               {
                 opacity: isLoading ? 0.7 : 1,
                 backgroundColor:
-                  selectedOption === 'none' ? '#4485ff' : '#141a2a',
-                flexDirection: 'row', // Align text and icon horizontally
-                justifyContent: 'space-between', // Keep text left, icon right
-                alignItems: 'center', // Center vertically
-                height: 64, // Explicitly define button height to prevent "fat" buttons
-                paddingHorizontal: 20, // Add horizontal padding without changing height
+                  selectedOption === 'oily' ? '#4485ff' : '#141a2a',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                height: 64,
+                paddingHorizontal: 20,
               },
             ]}
             disabled={isLoading}
-            onPress={() => handleOptionSelect('none')}
+            onPress={() => handleOptionSelect('oily')}
           >
             <Text style={styles.radioButtonText}>Oily</Text>
             <Ionicons
               name="checkmark-circle-outline"
               size={24}
-              color="#A9A9A9" // Set gray color
-              style={{ flexShrink: 0 }} // Prevent icon from resizing
+              color="#A9A9A9"
+              style={{ flexShrink: 0 }}
             />
           </TouchableOpacity>
           <TouchableOpacity
@@ -184,11 +234,11 @@ const NatureScreen = () => {
                 opacity: isLoading ? 0.7 : 1,
                 backgroundColor:
                   selectedOption === 'undetermined' ? '#4485ff' : '#141a2a',
-                flexDirection: 'row', // Align text and icon horizontally
-                justifyContent: 'space-between', // Keep text left, icon right
-                alignItems: 'center', // Center vertically
-                height: 64, // Explicitly define button height to prevent "fat" buttons
-                paddingHorizontal: 20, // Add horizontal padding without changing height
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                height: 64,
+                paddingHorizontal: 20,
               },
             ]}
             disabled={isLoading}
@@ -198,8 +248,8 @@ const NatureScreen = () => {
             <Ionicons
               name="checkmark-circle-outline"
               size={24}
-              color="#A9A9A9" // Set gray color
-              style={{ flexShrink: 0 }} // Prevent icon from resizing
+              color="#A9A9A9"
+              style={{ flexShrink: 0 }}
             />
           </TouchableOpacity>
           {/* Submit Button */}
@@ -310,3 +360,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
 });
+function uuidv4(): string | null {
+  throw new Error('Function not implemented.');
+}

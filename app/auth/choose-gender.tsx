@@ -9,15 +9,36 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'expo-router';
 import { useUser } from '@clerk/clerk-expo';
+import { addDoc, collection, doc, setDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import ProgressLineWithCircles from '@/components/ProgressBarWithCircles';
 import { LinearGradient } from 'expo-linear-gradient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import 'react-native-get-random-values';
+
+import { db } from '@/firebase';
+
+import { v4 as uuidv4 } from 'uuid';
 
 const ChooseGenderScreen = () => {
   const { user, isLoaded } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const insets = useSafeAreaInsets();
+
+  async function getTempId() {
+    try {
+      let tempId = await AsyncStorage.getItem('tempId');
+      if (!tempId) {
+        tempId = uuidv4(); // Generate a new UUID
+        await AsyncStorage.setItem('tempId', tempId);
+      }
+      return tempId;
+    } catch (error) {
+      console.error('Error with AsyncStorage:', error);
+      throw error;
+    }
+  }
 
   const { control, handleSubmit, setValue, getValues } = useForm({
     defaultValues: {
@@ -27,8 +48,39 @@ const ChooseGenderScreen = () => {
 
   // Submit Handler
   const onSubmit = async (gender: string) => {
+    const tempId = await getTempId();
+
     try {
       setIsLoading(true);
+
+      // Create a reference to the user's document in Firestore
+      async function addDocument() {
+        console.log('Starting to add document...'); // Add this
+        try {
+          const docRef = await addDoc(collection(db, 'users'), {
+            tempId: tempId,
+            gender: gender,
+          });
+          console.log('Document written with ID: ', docRef.id);
+        } catch (e) {
+          console.error('Error adding document: ', e);
+        }
+      }
+
+      addDocument();
+      // const userDocRef = doc(db, 'users', user?.id || '');
+
+      // // Store the gender choice in Firestore
+      // await setDoc(
+      //   userDocRef,
+      //   {
+      //     gender,
+      //     updatedAt: new Date().toISOString(),
+      //     userId: user?.id,
+      //     email: user?.emailAddresses[0]?.emailAddress,
+      //   },
+      //   { merge: true }
+      // ); // Using merge to preserve other fields
 
       // Update user's metadata with gender and onboarding flag
       await user?.update({

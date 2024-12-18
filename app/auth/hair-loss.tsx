@@ -17,6 +17,17 @@ import { useEffect, useState } from 'react';
 import ProgressLineWithCircles from '@/components/ProgressBarWithCircles';
 import React from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  addDoc,
+  collection,
+  doc,
+  getDocs,
+  query,
+  setDoc,
+  where,
+} from 'firebase/firestore';
+import { db } from '@/firebase';
 
 const HairLossScreen = () => {
   const { user, isLoaded } = useUser();
@@ -30,13 +41,63 @@ const HairLossScreen = () => {
 
   const { control, handleSubmit, setValue } = useForm({
     defaultValues: {
-      gender: '',
+      hairLossHistory: '',
     },
   });
 
+  async function getTempId() {
+    try {
+      let tempId = await AsyncStorage.getItem('tempId');
+      if (!tempId) {
+        tempId = uuidv4(); // Generate a new UUID
+        await AsyncStorage.setItem('tempId', tempId || '');
+      }
+      return tempId;
+    } catch (error) {
+      console.error('Error with AsyncStorage:', error);
+      throw error;
+    }
+  }
+
   // Submit Handler
   const onSubmit = async (data: any) => {
-    const { gender } = data;
+    // Use selectedOption to set hairLossHistory
+    const hairLossHistory = selectedOption; // Set hairLossHistory from selectedOption
+    const tempId = await getTempId();
+
+    async function addDocument() {
+      console.log('Starting to add document...'); // Add this
+      try {
+        const userQuery = query(
+          collection(db, 'users'),
+          where('tempId', '==', tempId)
+        );
+        const querySnapshot = await getDocs(userQuery);
+        if (!querySnapshot.empty) {
+          // Update the existing document
+          const docId = querySnapshot.docs[0].id; // Get the document ID
+          const userRef = doc(db, 'users', docId);
+
+          await setDoc(
+            userRef,
+            {
+              hairLossHistory: hairLossHistory, // Merge referral data
+            },
+            { merge: true } // Ensure the update doesn't overwrite existing data
+          );
+        } else {
+          // Create a new document if none exists
+          await addDoc(collection(db, 'users'), {
+            tempId: tempId,
+            hairLossHistory: hairLossHistory,
+          });
+        }
+      } catch (e) {
+        console.error('Error adding document: ', e);
+      }
+    }
+
+    addDocument();
 
     try {
       setIsLoading(true);
@@ -67,14 +128,6 @@ const HairLossScreen = () => {
   };
 
   // Sync user data to form when loaded
-  useEffect(() => {
-    if (isLoaded && user) {
-      const existingGender = String(user?.unsafeMetadata?.gender) || '';
-      if (existingGender) {
-        setValue('gender', existingGender);
-      }
-    }
-  }, [isLoaded, user, setValue]);
 
   // Handler for selecting an option (only allows one option)
   const handleOptionSelect = (option: string) => {
@@ -284,3 +337,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
 });
+function uuidv4(): string | null {
+  throw new Error('Function not implemented.');
+}
