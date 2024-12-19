@@ -11,6 +11,8 @@ import Age from './age';
 import { useRouter } from 'expo-router';
 import Notification from './notification';
 import Referral from './referral';
+import { useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const Stack = createNativeStackNavigator();
 
 export default function AuthLayout() {
@@ -20,121 +22,164 @@ export default function AuthLayout() {
   const router = useRouter();
 
   // Guard: If the user is not signed in, show the auth flow
-  if (!isSignedIn) {
-    return (
-      <Stack.Navigator>
-        <Stack.Screen name="index" component={Index} />
-      </Stack.Navigator>
-    );
-  }
+  // if (!isSignedIn) {
+  //   return (
+  //     <Stack.Navigator>
+  //       <Stack.Screen
+  //         options={{ headerShown: false }}
+  //         name="index"
+  //         component={Index}
+  //       />
+  //     </Stack.Navigator>
+  //   );
+  // }
 
   // Extract onboarding flags from user metadata
-  const hasChosenGender = user?.unsafeMetadata?.gender_chosen;
-  const hasChosenAge = user?.unsafeMetadata?.chosen_age;
-  const hasChosenImprovement = user?.unsafeMetadata?.chosen_improvement;
-  const hasChosenHair = user?.unsafeMetadata?.chosen_hair;
-  const hasChosenHistory = user?.unsafeMetadata?.chosen_history;
-  const hasChosenNature = user?.unsafeMetadata?.chosen_nature;
-  const hasChosenNotification = user?.unsafeMetadata?.chosen_notifications;
+  // const hasChosenGender = user?.unsafeMetadata?.gender_chosen;
+  // const hasChosenAge = user?.unsafeMetadata?.chosen_age;
+  // const hasChosenImprovement = user?.unsafeMetadata?.chosen_improvement;
+  // const hasChosenHair = user?.unsafeMetadata?.chosen_hair;
+  // const hasChosenHistory = user?.unsafeMetadata?.chosen_history;
+  // const hasChosenNature = user?.unsafeMetadata?.chosen_nature;
+  // const hasChosenNotification = user?.unsafeMetadata?.chosen_notifications;
 
-  const hasCompletedReferral = user?.unsafeMetadata?.referral_complete;
-  const onboardingCompleted = user?.unsafeMetadata?.onboarding_completed;
+  // const hasCompletedReferral = user?.unsafeMetadata?.referral_complete;
+  // const onboardingCompleted = user?.unsafeMetadata?.onboarding_completed;
+  // const hasSignedIn = user?.unsafeMetadata?.signed_in;
+
+  const [onboardingState, setOnboardingState] = useState({
+    gender_chosen: false,
+    referral_complete: false,
+    improvement_chosen: false,
+    hair_chosen: false,
+    history_chosen: false,
+    nature_chosen: false,
+    age_chosen: false,
+    notifications_chosen: false,
+    signed_in: false,
+    // ... other states
+  });
+
+  // console.log('Initial onboardingState:', onboardingState); // Log the initial value
+
+  useEffect(() => {
+    const loadState = async () => {
+      try {
+        const state = await AsyncStorage.getItem('onboardingState');
+        if (state) {
+          setOnboardingState(JSON.parse(state));
+        }
+      } catch (error) {
+        console.error('Error loading onboarding state:', error);
+      }
+    };
+    loadState();
+  }, []);
 
   // Step 1: Redirect to "choose-gender" if gender is not chosen
-  if (!hasChosenGender && pathName !== '/auth/choose-gender') {
-    router.push('/auth/choose-gender');
-  }
-
-  // Step 2: Redirect to "referral" if gender is chosen but referral is incomplete
-  if (
-    hasChosenGender &&
-    !hasCompletedReferral &&
-    pathName !== '/auth/referral'
-  ) {
-    router.push('/auth/referral');
-  }
-
-  if (
-    hasChosenGender &&
-    hasCompletedReferral &&
-    !hasChosenAge &&
-    pathName !== '/auth/age'
-  ) {
-    router.push('/auth/age');
-  }
-
-  if (
-    hasChosenGender &&
-    hasCompletedReferral &&
-    hasChosenAge &&
-    !hasChosenImprovement &&
-    pathName !== '/auth/improvement'
-  ) {
-    return <Redirect href="/auth/improvement" />;
-  }
-  if (
-    hasChosenGender &&
-    hasCompletedReferral &&
-    hasChosenAge &&
-    hasChosenImprovement &&
-    !hasChosenHair &&
-    pathName !== '/auth/wash-hair'
-  ) {
-    return <Redirect href="/auth/wash-hair" />;
-  }
-
-  if (
-    hasChosenGender &&
-    hasCompletedReferral &&
-    hasChosenAge &&
-    hasChosenImprovement &&
-    hasChosenHair &&
-    !hasChosenHistory &&
-    pathName !== '/auth/hair-loss'
-  ) {
-    return <Redirect href="/auth/hair-loss" />;
-  }
-
-  if (
-    hasChosenGender &&
-    hasCompletedReferral &&
-    hasChosenAge &&
-    hasChosenImprovement &&
-    hasChosenHair &&
-    hasChosenHistory &&
-    !hasChosenNature &&
-    pathName !== '/auth/nature'
-  ) {
-    return <Redirect href="/auth/nature" />;
-  }
-
-  if (
-    hasChosenGender &&
-    hasCompletedReferral &&
-    hasChosenAge &&
-    hasChosenImprovement &&
-    hasChosenHair &&
-    hasChosenHistory &&
-    hasChosenNature &&
-    !hasChosenNotification &&
-    pathName !== '/auth/notification'
-  ) {
-    return <Redirect href="/auth/notification" />;
-  }
+  useEffect(() => {
+    if (!onboardingState.gender_chosen && pathName !== '/auth/choose-gender') {
+      router.push('/auth/choose-gender');
+    } else if (
+      onboardingState.gender_chosen &&
+      !onboardingState.referral_complete &&
+      pathName !== '/auth/referral'
+    ) {
+      router.push('/auth/referral');
+    } else if (
+      onboardingState.gender_chosen &&
+      onboardingState.referral_complete &&
+      !onboardingState.age_chosen &&
+      pathName !== '/auth/age'
+    ) {
+      router.push('/auth/age');
+    } else if (
+      onboardingState.gender_chosen &&
+      onboardingState.referral_complete &&
+      onboardingState.age_chosen &&
+      !onboardingState.improvement_chosen &&
+      pathName !== '/auth/improvement'
+    ) {
+      router.push('/auth/improvement');
+    } else if (
+      onboardingState.gender_chosen &&
+      onboardingState.referral_complete &&
+      onboardingState.age_chosen &&
+      onboardingState.improvement_chosen &&
+      !onboardingState.hair_chosen &&
+      pathName !== '/auth/wash-hair'
+    ) {
+      router.push('/auth/wash-hair');
+    } else if (
+      onboardingState.gender_chosen &&
+      onboardingState.referral_complete &&
+      onboardingState.age_chosen &&
+      onboardingState.improvement_chosen &&
+      onboardingState.hair_chosen &&
+      !onboardingState.history_chosen &&
+      pathName !== '/auth/hair-loss'
+    ) {
+      router.push('/auth/hair-loss');
+    } else if (
+      onboardingState.gender_chosen &&
+      onboardingState.referral_complete &&
+      onboardingState.age_chosen &&
+      onboardingState.improvement_chosen &&
+      onboardingState.hair_chosen &&
+      onboardingState.history_chosen &&
+      !onboardingState.nature_chosen &&
+      pathName !== '/auth/nature'
+    ) {
+      router.push('/auth/nature');
+    } else if (
+      onboardingState.gender_chosen &&
+      onboardingState.referral_complete &&
+      onboardingState.age_chosen &&
+      onboardingState.improvement_chosen &&
+      onboardingState.hair_chosen &&
+      onboardingState.history_chosen &&
+      onboardingState.nature_chosen &&
+      !onboardingState.notifications_chosen &&
+      pathName !== '/auth/notification'
+    ) {
+      router.push('/auth/notification');
+    } else if (
+      onboardingState.gender_chosen &&
+      onboardingState.referral_complete &&
+      onboardingState.age_chosen &&
+      onboardingState.improvement_chosen &&
+      onboardingState.hair_chosen &&
+      onboardingState.history_chosen &&
+      onboardingState.nature_chosen &&
+      onboardingState.notifications_chosen &&
+      !onboardingState.signed_in &&
+      pathName !== '/auth'
+    ) {
+      router.push('/auth');
+    } else {
+      // console.log('sending you to the main app');
+      router.push('/(tabs)');
+    }
+  }, []);
+  // console.log('onboardingState:', onboardingState);
 
   // Step 3: Redirect to home if onboarding is completed
-  if (onboardingCompleted) {
-    return <Redirect href="/(tabs)" />;
-  }
+  // console.log('onboardingState:', onboardingState);
+  // console.log('gender chosen:', onboardingState.gender_chosen);
+  // console.log('referral chosen:', onboardingState.referral_complete);
+  // console.log('age chosen:', onboardingState.age_chosen);
+  // console.log('improvement chosen:', onboardingState.improvement_chosen);
 
+  // console.log('hair chosen:', onboardingState.hair_chosen);
+  // console.log('history chosen:', onboardingState.history_chosen);
+  // console.log('nature chosen:', onboardingState.nature_chosen);
+  // console.log('notifications chosen:', onboardingState.notifications_chosen);
+  // console.log('signed in:', onboardingState.signed_in);
+
+  // if (onboardingCompleted)
   // Default Stack for Onboarding Screens
   return (
     <Stack.Navigator>
-      <Stack.Screen
-        name="index"
-        options={{ headerShown: false }}
-        component={Index}
-      />
       <Stack.Screen
         name="choose-gender"
         options={{ headerShown: false }}
@@ -174,6 +219,11 @@ export default function AuthLayout() {
         name="notification"
         options={{ headerShown: false }}
         component={Notification}
+      />
+      <Stack.Screen
+        name="index"
+        options={{ headerShown: false }}
+        component={Index}
       />
     </Stack.Navigator>
   );

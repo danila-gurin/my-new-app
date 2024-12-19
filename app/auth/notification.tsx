@@ -20,6 +20,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import Constants from 'expo-constants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const NotificationScreen = () => {
   const { user, isLoaded } = useUser();
@@ -41,23 +42,14 @@ const NotificationScreen = () => {
     try {
       setIsLoading(true);
 
-      await user?.update({
-        unsafeMetadata: {
-          gender_chosen: true,
-          referral_complete: true,
-          chosen_age: true,
-          chosen_improvement: true,
-          chosen_hair: true,
-          chosen_history: true,
-          chosen_nature: true,
-          chosen_notifications: true,
-          onboarding_completed: true,
-        },
-      });
+      const currentState = await AsyncStorage.getItem('onboardingState');
+      const newState = {
+        ...(currentState ? JSON.parse(currentState) : {}),
+        notifications_chosen: true,
+      };
+      await AsyncStorage.setItem('onboardingState', JSON.stringify(newState));
 
-      await user?.reload();
-
-      router.push('/(tabs)');
+      router.push('/auth');
     } catch (error: any) {
       console.error('Error updating user:', error);
     } finally {
@@ -132,6 +124,36 @@ const NotificationScreen = () => {
       >
         {/* Heading Section */}
         <View style={styles.headingContainer}>
+          <TouchableOpacity
+            style={styles.goBackButton}
+            onPress={async () => {
+              try {
+                const currentState = await AsyncStorage.getItem(
+                  'onboardingState'
+                );
+                // Update user's metadata
+                const newState = {
+                  ...(currentState ? JSON.parse(currentState) : {}),
+                  notifications_chosen: false,
+                };
+                await AsyncStorage.setItem(
+                  'onboardingState',
+                  JSON.stringify(newState)
+                );
+
+                // Navigate to the choose-gender screen
+                router.back();
+              } catch (error) {
+                console.error('Error updating user metadata:', error);
+              }
+            }}
+          >
+            <Ionicons
+              name="arrow-back-outline"
+              color="#4485ff"
+              size={35}
+            ></Ionicons>
+          </TouchableOpacity>
           <ProgressLineWithCircles currentStep={8} />
           <Text style={styles.label}>Enable Notifications</Text>
         </View>
@@ -139,7 +161,6 @@ const NotificationScreen = () => {
         {/* Circle with Bell */}
         <View style={styles.circleContainer}>
           <TouchableOpacity onPress={handleNotificationSetup}>
-            {' '}
             {/* Added onPress here */}
             <View style={styles.circle}>
               <Image
@@ -158,9 +179,9 @@ const NotificationScreen = () => {
             disabled={isLoading}
             onPress={handleContinue}
           >
-            {isLoading ? (
+            {/* {isLoading ? (
               <ActivityIndicator size="small" color="white" />
-            ) : null}
+            ) : null} */}
             <LinearGradient
               colors={[
                 'rgba(2,0,36,1)',
@@ -234,7 +255,7 @@ const styles = StyleSheet.create({
   button: {
     padding: 20,
     borderRadius: 30,
-    marginTop: 40,
+    top: 59,
     borderColor: 'white',
     justifyContent: 'center',
     width: 325,
@@ -244,5 +265,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: 'semibold',
     fontSize: 18,
+  },
+  goBackButton: {
+    position: 'absolute',
+    left: 0,
+    top: 13,
+    borderWidth: 1, // Adding border width
+    backgroundColor: '#383d45', // Define the color of the border
+    borderRadius: 50, // Optional: To make it rounded, adjust as needed
+    padding: 5, // Optional: Adjust padding for better appearance
   },
 });

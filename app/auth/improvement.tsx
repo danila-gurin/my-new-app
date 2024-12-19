@@ -93,18 +93,12 @@ const ImprovementScreen = () => {
       setIsLoading(true);
 
       // Update user's metadata with selected options
-      await user?.update({
-        unsafeMetadata: {
-          gender_chosen: true,
-          referral_complete: true, // Use the updated state here
-          chosen_age: true,
-          chosen_improvement: true,
-          chosen_hair: false,
-          onboarding_completed: false,
-        },
-      });
-
-      await user?.reload();
+      const currentState = await AsyncStorage.getItem('onboardingState');
+      const newState = {
+        ...(currentState ? JSON.parse(currentState) : {}),
+        improvement_chosen: true,
+      };
+      await AsyncStorage.setItem('onboardingState', JSON.stringify(newState));
 
       // Navigate to main app
       router.push('/auth/wash-hair');
@@ -146,12 +140,17 @@ const ImprovementScreen = () => {
             onPress={async () => {
               try {
                 // Update user's metadata
-                user?.update({
-                  unsafeMetadata: {
-                    gender_chosen: true,
-                    referral: false,
-                  },
-                });
+                const currentState = await AsyncStorage.getItem(
+                  'onboardingState'
+                );
+                const newState = {
+                  ...(currentState ? JSON.parse(currentState) : {}),
+                  referral_complete: false,
+                };
+                await AsyncStorage.setItem(
+                  'onboardingState',
+                  JSON.stringify(newState)
+                );
 
                 // Navigate to the choose-gender screen
                 router.back();
@@ -160,7 +159,6 @@ const ImprovementScreen = () => {
               }
             }}
           >
-            {' '}
             <Ionicons
               name="arrow-back-outline"
               color="#4485ff"
@@ -184,12 +182,21 @@ const ImprovementScreen = () => {
                   ? '#4485ff'
                   : '#141a2a', // Highlight when selected
                 height: 64,
+                flexDirection: 'row', // Align text and icon horizontally
+                justifyContent: 'space-between', // Keep text left, icon right
+                alignItems: 'center', // Center vertically
               },
             ]}
             disabled={isLoading}
             onPress={() => handleOptionSelect('style')}
           >
             <Text style={styles.radioButtonText}>Choosing the right style</Text>
+            <Ionicons
+              name="checkmark-circle-outline"
+              size={24}
+              color={selectedOptions.includes('style') ? '#1ae84a' : '#A9A9A9'}
+              style={{ flexShrink: 0 }} // Prevent icon from resizing
+            />
           </TouchableOpacity>
           <TouchableOpacity
             style={[
@@ -200,12 +207,21 @@ const ImprovementScreen = () => {
                   ? '#4485ff'
                   : '#141a2a', // Highlight when selected
                 height: 64,
+                flexDirection: 'row', // Align text and icon horizontally
+                justifyContent: 'space-between', // Keep text left, icon right
+                alignItems: 'center', // Center vertically
               },
             ]}
             disabled={isLoading}
             onPress={() => handleOptionSelect('health')}
           >
             <Text style={styles.radioButtonText}>Achieving Hair Health</Text>
+            <Ionicons
+              name="checkmark-circle-outline"
+              size={24}
+              color={selectedOptions.includes('health') ? '#1ae84a' : '#A9A9A9'}
+              style={{ flexShrink: 0 }} // Prevent icon from resizing
+            />
           </TouchableOpacity>
           <TouchableOpacity
             style={[
@@ -216,12 +232,21 @@ const ImprovementScreen = () => {
                   ? '#4485ff'
                   : '#141a2a', // Highlight when selected
                 height: 64,
+                flexDirection: 'row', // Align text and icon horizontally
+                justifyContent: 'space-between', // Keep text left, icon right
+                alignItems: 'center', // Center vertically
               },
             ]}
             disabled={isLoading}
             onPress={() => handleOptionSelect('loss')}
           >
             <Text style={styles.radioButtonText}>Combating Hair Loss</Text>
+            <Ionicons
+              name="checkmark-circle-outline"
+              size={24}
+              color={selectedOptions.includes('loss') ? '#1ae84a' : '#A9A9A9'}
+              style={{ flexShrink: 0 }} // Prevent icon from resizing
+            />
           </TouchableOpacity>
 
           {/* Submit Button */}
@@ -229,11 +254,11 @@ const ImprovementScreen = () => {
             <TouchableOpacity
               style={[styles.button, { opacity: isLoading ? 0.7 : 1 }]}
               onPress={onSubmit} // Use the updated onSubmit handler
-              disabled={isLoading}
+              disabled={isLoading || selectedOptions.length === 0}
             >
-              {isLoading ? (
+              {/* {isLoading ? (
                 <ActivityIndicator size="small" color="white" />
-              ) : null}
+              ) : null} */}
               <LinearGradient
                 colors={[
                   'rgba(2,0,36,1)',
@@ -299,14 +324,15 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     width: '100%',
-    marginTop: 110,
+    // marginTop: 110,
+    top: 70,
     alignItems: 'center',
     gap: 20,
   },
   button: {
     padding: 20,
     borderRadius: 30,
-    marginTop: 20,
+    top: 37,
     borderColor: 'white',
     alignItems: 'center',
     justifyContent: 'center',

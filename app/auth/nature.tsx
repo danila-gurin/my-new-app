@@ -102,21 +102,12 @@ const NatureScreen = () => {
       setIsLoading(true);
 
       // Update user's metadata with selected options
-      await user?.update({
-        unsafeMetadata: {
-          gender_chosen: true,
-          referral_complete: true,
-          chosen_age: true,
-          chosen_improvement: true,
-          chosen_hair: true,
-          chosen_history: true,
-          chosen_nature: true, // Ensure "chosen_nature" is updated
-          chosen_notifications: false,
-          onboarding_completed: false,
-        },
-      });
-
-      await user?.reload();
+      const currentState = await AsyncStorage.getItem('onboardingState');
+      const newState = {
+        ...(currentState ? JSON.parse(currentState) : {}),
+        nature_chosen: true,
+      };
+      await AsyncStorage.setItem('onboardingState', JSON.stringify(newState));
 
       // Navigate to main app
       router.push('/auth/notification');
@@ -146,6 +137,36 @@ const NatureScreen = () => {
       >
         {/* Heading Section */}
         <View style={styles.headingContainer}>
+          <TouchableOpacity
+            style={styles.goBackButton}
+            onPress={async () => {
+              try {
+                const currentState = await AsyncStorage.getItem(
+                  'onboardingState'
+                );
+                // Update user's metadata
+                const newState = {
+                  ...(currentState ? JSON.parse(currentState) : {}),
+                  history_chosen: false,
+                };
+                await AsyncStorage.setItem(
+                  'onboardingState',
+                  JSON.stringify(newState)
+                );
+
+                // Navigate to the choose-gender screen
+                router.back();
+              } catch (error) {
+                console.error('Error updating user metadata:', error);
+              }
+            }}
+          >
+            <Ionicons
+              name="arrow-back-outline"
+              color="#4485ff"
+              size={35}
+            ></Ionicons>
+          </TouchableOpacity>
           <ProgressLineWithCircles currentStep={7} />
           <Text style={styles.label}>Pick your{'\n'}scalp's nature</Text>
         </View>
@@ -167,13 +188,13 @@ const NatureScreen = () => {
               },
             ]}
             disabled={isLoading}
-            onPress={() => handleOptionSelect('dry')}
+            onPress={() => handleOptionSelect('Dry')}
           >
             <Text style={styles.radioButtonText}>Dry</Text>
             <Ionicons
               name="checkmark-circle-outline"
               size={24}
-              color="#A9A9A9"
+              color={selectedOption === 'Dry' ? '#1ae84a' : '#A9A9A9'}
               style={{ flexShrink: 0 }}
             />
           </TouchableOpacity>
@@ -195,10 +216,11 @@ const NatureScreen = () => {
             onPress={() => handleOptionSelect('Normal')}
           >
             <Text style={styles.radioButtonText}>Normal</Text>
+
             <Ionicons
               name="checkmark-circle-outline"
               size={24}
-              color="#A9A9A9"
+              color={selectedOption === 'normal' ? '#1ae84a' : '#A9A9A9'}
               style={{ flexShrink: 0 }}
             />
           </TouchableOpacity>
@@ -223,7 +245,7 @@ const NatureScreen = () => {
             <Ionicons
               name="checkmark-circle-outline"
               size={24}
-              color="#A9A9A9"
+              color={selectedOption === 'oily' ? '#1ae84a' : '#A9A9A9'}
               style={{ flexShrink: 0 }}
             />
           </TouchableOpacity>
@@ -248,7 +270,7 @@ const NatureScreen = () => {
             <Ionicons
               name="checkmark-circle-outline"
               size={24}
-              color="#A9A9A9"
+              color={selectedOption === 'undetermined' ? '#1ae84a' : '#A9A9A9'}
               style={{ flexShrink: 0 }}
             />
           </TouchableOpacity>
@@ -257,11 +279,11 @@ const NatureScreen = () => {
             <TouchableOpacity
               style={[styles.button, { opacity: isLoading ? 0.7 : 1 }]}
               onPress={handleSubmit(onSubmit)}
-              disabled={isLoading}
+              disabled={isLoading || !selectedOption}
             >
-              {isLoading ? (
+              {/* {isLoading ? (
                 <ActivityIndicator size="small" color="white" />
-              ) : null}
+              ) : null} */}
               <LinearGradient
                 colors={[
                   'rgba(2,0,36,1)',
@@ -327,14 +349,15 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     width: '100%',
-    marginTop: 90,
+    top: 70,
     alignItems: 'center',
     gap: 20,
   },
   button: {
     padding: 20,
     borderRadius: 30,
-    marginTop: 5,
+    marginTop: 7,
+    bottom: 13,
     borderColor: 'white',
     alignItems: 'center',
     justifyContent: 'center',
@@ -358,6 +381,15 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'semibold',
     fontSize: 18,
+  },
+  goBackButton: {
+    position: 'absolute',
+    left: 0,
+    top: 13,
+    borderWidth: 1, // Adding border width
+    backgroundColor: '#383d45', // Define the color of the border
+    borderRadius: 50, // Optional: To make it rounded, adjust as needed
+    padding: 5, // Optional: Adjust padding for better appearance
   },
 });
 function uuidv4(): string | null {

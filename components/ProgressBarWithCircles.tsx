@@ -17,6 +17,7 @@ const ProgressLineWithCircles = ({ currentStep = 0 }) => {
     { label: '', completed: currentStep >= 6 },
     { label: '', completed: currentStep >= 7 },
     { label: '', completed: currentStep >= 8 },
+    { label: '', completed: currentStep >= 9 },
   ];
 
   // Adjust the progress to push the filled line back by one step

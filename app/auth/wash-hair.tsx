@@ -25,6 +25,7 @@ import {
   where,
 } from 'firebase/firestore';
 import { db } from '@/firebase';
+import { Ionicons } from '@expo/vector-icons';
 
 const WashScreen = () => {
   const { user, isLoaded } = useUser();
@@ -93,19 +94,12 @@ const WashScreen = () => {
       setIsLoading(true);
 
       // Update user's metadata with selected options
-      await user?.update({
-        unsafeMetadata: {
-          gender_chosen: true,
-          referral_complete: true, // Use the updated state here
-          chosen_age: true,
-          chosen_improvement: true,
-          chosen_hair: true,
-          chosen_history: false,
-          onboarding_completed: false,
-        },
-      });
-
-      await user?.reload();
+      const currentState = await AsyncStorage.getItem('onboardingState');
+      const newState = {
+        ...(currentState ? JSON.parse(currentState) : {}),
+        hair_chosen: true,
+      };
+      await AsyncStorage.setItem('onboardingState', JSON.stringify(newState));
 
       // Navigate to main app
       router.push('/auth/hair-loss');
@@ -135,6 +129,36 @@ const WashScreen = () => {
       >
         {/* Heading Section */}
         <View style={styles.headingContainer}>
+          <TouchableOpacity
+            style={styles.goBackButton}
+            onPress={async () => {
+              try {
+                const currentState = await AsyncStorage.getItem(
+                  'onboardingState'
+                );
+                // Update user's metadata
+                const newState = {
+                  ...(currentState ? JSON.parse(currentState) : {}),
+                  age_chosen: false,
+                };
+                await AsyncStorage.setItem(
+                  'onboardingState',
+                  JSON.stringify(newState)
+                );
+
+                // Navigate to the choose-gender screen
+                router.back();
+              } catch (error) {
+                console.error('Error updating user metadata:', error);
+              }
+            }}
+          >
+            <Ionicons
+              name="arrow-back-outline"
+              color="#4485ff"
+              size={35}
+            ></Ionicons>
+          </TouchableOpacity>
           <ProgressLineWithCircles currentStep={5} />
           <Text style={styles.label}>
             How frequently do you{'\n'}wash your hair?
@@ -150,12 +174,21 @@ const WashScreen = () => {
                 opacity: isLoading ? 0.7 : 1,
                 backgroundColor:
                   selectedOption === 'every day' ? '#4485ff' : '#141a2a', // Highlight when selected
+                flexDirection: 'row', // Align text and icon horizontally
+                justifyContent: 'space-between', // Keep text left, icon right
+                alignItems: 'center', // Center vertically
               },
             ]}
             disabled={isLoading}
             onPress={() => handleOptionSelect('every day')}
           >
             <Text style={styles.radioButtonText}>Every Day</Text>
+            <Ionicons
+              name="checkmark-circle-outline"
+              size={24}
+              color={selectedOption === 'every day' ? '#1ae84a' : '#A9A9A9'}
+              style={{ flexShrink: 0 }} // Prevent icon from resizing
+            />
           </TouchableOpacity>
           <TouchableOpacity
             style={[
@@ -164,12 +197,23 @@ const WashScreen = () => {
                 opacity: isLoading ? 0.7 : 1,
                 backgroundColor:
                   selectedOption === 'every other day' ? '#4485ff' : '#141a2a', // Highlight when selected
+                flexDirection: 'row', // Align text and icon horizontally
+                justifyContent: 'space-between', // Keep text left, icon right
+                alignItems: 'center', // Center vertically
               },
             ]}
             disabled={isLoading}
             onPress={() => handleOptionSelect('every other day')}
           >
             <Text style={styles.radioButtonText}>Every Other Day</Text>
+            <Ionicons
+              name="checkmark-circle-outline"
+              size={24}
+              color={
+                selectedOption === 'every other day' ? '#1ae84a' : '#A9A9A9'
+              }
+              style={{ flexShrink: 0 }} // Prevent icon from resizing
+            />
           </TouchableOpacity>
           <TouchableOpacity
             style={[
@@ -178,12 +222,23 @@ const WashScreen = () => {
                 opacity: isLoading ? 0.7 : 1,
                 backgroundColor:
                   selectedOption === '2-3 times a week' ? '#4485ff' : '#141a2a', // Highlight when selected
+                flexDirection: 'row', // Align text and icon horizontally
+                justifyContent: 'space-between', // Keep text left, icon right
+                alignItems: 'center', // Center vertically
               },
             ]}
             disabled={isLoading}
             onPress={() => handleOptionSelect('2-3 times a week')}
           >
             <Text style={styles.radioButtonText}>2-3 Times a Week</Text>
+            <Ionicons
+              name="checkmark-circle-outline"
+              size={24}
+              color={
+                selectedOption === '2-3 times a week' ? '#1ae84a' : '#A9A9A9'
+              }
+              style={{ flexShrink: 0 }} // Prevent icon from resizing
+            />
           </TouchableOpacity>
           <TouchableOpacity
             style={[
@@ -192,12 +247,21 @@ const WashScreen = () => {
                 opacity: isLoading ? 0.7 : 1,
                 backgroundColor:
                   selectedOption === 'once a week' ? '#4485ff' : '#141a2a', // Highlight when selected
+                flexDirection: 'row', // Align text and icon horizontally
+                justifyContent: 'space-between', // Keep text left, icon right
+                alignItems: 'center', // Center vertically
               },
             ]}
             disabled={isLoading}
             onPress={() => handleOptionSelect('once a week')}
           >
             <Text style={styles.radioButtonText}>Once a Week</Text>
+            <Ionicons
+              name="checkmark-circle-outline"
+              size={24}
+              color={selectedOption === 'once a week' ? '#1ae84a' : '#A9A9A9'}
+              style={{ flexShrink: 0 }} // Prevent icon from resizing
+            />
           </TouchableOpacity>
 
           {/* Submit Button */}
@@ -205,11 +269,11 @@ const WashScreen = () => {
             <TouchableOpacity
               style={[styles.button, { opacity: isLoading ? 0.7 : 1 }]}
               onPress={onSubmit} // Call onSubmit directly
-              disabled={isLoading}
+              disabled={isLoading || selectedOption === ''} // Disable if no option selected
             >
-              {isLoading ? (
+              {/* {isLoading ? (
                 <ActivityIndicator size="small" color="white" />
-              ) : null}
+              ) : null} */}
               <LinearGradient
                 colors={[
                   'rgba(2,0,36,1)',
@@ -268,6 +332,15 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
   },
+  goBackButton: {
+    position: 'absolute',
+    left: 0,
+    top: 13,
+    borderWidth: 1, // Adding border width
+    backgroundColor: '#383d45', // Define the color of the border
+    borderRadius: 50, // Optional: To make it rounded, adjust as needed
+    padding: 5, // Optional: Adjust padding for better appearance
+  },
   description: {
     fontSize: 11,
     color: 'white',
@@ -275,7 +348,7 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     width: '100%',
-    marginTop: 90,
+    top: 70,
     alignItems: 'center',
     gap: 20,
   },
@@ -287,6 +360,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     width: 325,
+    bottom: 13,
   },
   radioButton: {
     padding: 20,

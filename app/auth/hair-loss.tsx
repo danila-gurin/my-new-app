@@ -103,20 +103,12 @@ const HairLossScreen = () => {
       setIsLoading(true);
 
       // Update user's metadata with selected options
-      await user?.update({
-        unsafeMetadata: {
-          gender_chosen: true,
-          referral_complete: true, // Use the updated state here
-          chosen_age: true,
-          chosen_improvement: true,
-          chosen_hair: true,
-          chosen_history: true,
-          chosen_nature: false,
-          onboarding_completed: false,
-        },
-      });
-
-      await user?.reload();
+      const currentState = await AsyncStorage.getItem('onboardingState');
+      const newState = {
+        ...(currentState ? JSON.parse(currentState) : {}),
+        history_chosen: true,
+      };
+      await AsyncStorage.setItem('onboardingState', JSON.stringify(newState));
 
       // Navigate to main app
       router.push('/auth/nature');
@@ -148,6 +140,36 @@ const HairLossScreen = () => {
       >
         {/* Heading Section */}
         <View style={styles.headingContainer}>
+          <TouchableOpacity
+            style={styles.goBackButton}
+            onPress={async () => {
+              try {
+                const currentState = await AsyncStorage.getItem(
+                  'onboardingState'
+                );
+                // Update user's metadata
+                const newState = {
+                  ...(currentState ? JSON.parse(currentState) : {}),
+                  hair_chosen: false,
+                };
+                await AsyncStorage.setItem(
+                  'onboardingState',
+                  JSON.stringify(newState)
+                );
+
+                // Navigate to the choose-gender screen
+                router.back();
+              } catch (error) {
+                console.error('Error updating user metadata:', error);
+              }
+            }}
+          >
+            <Ionicons
+              name="arrow-back-outline"
+              color="#4485ff"
+              size={35}
+            ></Ionicons>
+          </TouchableOpacity>
           <ProgressLineWithCircles currentStep={6} />
           <Text style={styles.label}>Any family{'\n'}hair loss history?</Text>
         </View>
@@ -175,7 +197,7 @@ const HairLossScreen = () => {
             <Ionicons
               name="checkmark-circle-outline"
               size={24}
-              color="#A9A9A9" // Set gray color
+              color={selectedOption === 'extreme' ? '#1ae84a' : '#A9A9A9'}
               style={{ flexShrink: 0 }} // Prevent icon from resizing
             />
           </TouchableOpacity>
@@ -197,10 +219,11 @@ const HairLossScreen = () => {
             onPress={() => handleOptionSelect('moderate')}
           >
             <Text style={styles.radioButtonText}>Moderate</Text>
+
             <Ionicons
               name="checkmark-circle-outline"
               size={24}
-              color="#A9A9A9" // Set gray color
+              color={selectedOption === 'moderate' ? '#1ae84a' : '#A9A9A9'}
               style={{ flexShrink: 0 }} // Prevent icon from resizing
             />
           </TouchableOpacity>
@@ -225,7 +248,7 @@ const HairLossScreen = () => {
             <Ionicons
               name="checkmark-circle-outline"
               size={24}
-              color="#A9A9A9" // Set gray color
+              color={selectedOption === 'none' ? '#1ae84a' : '#A9A9A9'}
               style={{ flexShrink: 0 }} // Prevent icon from resizing
             />
           </TouchableOpacity>
@@ -234,11 +257,11 @@ const HairLossScreen = () => {
             <TouchableOpacity
               style={[styles.button, { opacity: isLoading ? 0.7 : 1 }]}
               onPress={handleSubmit(onSubmit)}
-              disabled={isLoading}
+              disabled={isLoading || selectedOption === ''}
             >
-              {isLoading ? (
+              {/* {isLoading ? (
                 <ActivityIndicator size="small" color="white" />
-              ) : null}
+              ) : null} */}
               <LinearGradient
                 colors={[
                   'rgba(2,0,36,1)',
@@ -304,7 +327,7 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     width: '100%',
-    marginTop: 100,
+    top: 70,
     alignItems: 'center',
     gap: 20,
   },
@@ -312,6 +335,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 30,
     marginTop: 20,
+    top: 17,
     borderColor: 'white',
     alignItems: 'center',
     justifyContent: 'center',
@@ -335,6 +359,15 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'semibold',
     fontSize: 18,
+  },
+  goBackButton: {
+    position: 'absolute',
+    left: 0,
+    top: 13,
+    borderWidth: 1, // Adding border width
+    backgroundColor: '#383d45', // Define the color of the border
+    borderRadius: 50, // Optional: To make it rounded, adjust as needed
+    padding: 5, // Optional: Adjust padding for better appearance
   },
 });
 function uuidv4(): string | null {

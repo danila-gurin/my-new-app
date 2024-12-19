@@ -117,17 +117,13 @@ const AgeScreen = () => {
     try {
       setIsLoading(true);
 
-      await user?.update({
-        unsafeMetadata: {
-          gender_chosen: true,
-          referral_complete: true, // Use the updated state here
-          chosen_age: true,
-          chosen_improvement: false,
-          onboarding_completed: false,
-        },
-      });
+      const currentState = await AsyncStorage.getItem('onboardingState');
+      const newState = {
+        ...(currentState ? JSON.parse(currentState) : {}),
+        age_chosen: true,
+      };
+      await AsyncStorage.setItem('onboardingState', JSON.stringify(newState));
 
-      await user?.reload();
       router.push('/auth/improvement');
     } catch (error: any) {
       console.error('Error updating user:', error);
@@ -194,12 +190,12 @@ const AgeScreen = () => {
                   // Update user's metadata
                   await user?.update({
                     unsafeMetadata: {
-                      referral: false,
+                      referral_complete: false,
                     },
                   });
 
                   // Navigate to the choose-gender screen
-                  router.push('/auth/referral');
+                  router.back();
                 } catch (error) {
                   console.error('Error updating user metadata:', error);
                 }
@@ -249,31 +245,31 @@ const AgeScreen = () => {
               onPress={handleSubmit(onSubmit)}
               disabled={isLoading}
             >
-              {isLoading ? (
-                <ActivityIndicator size="small" color="white" />
-              ) : (
-                <LinearGradient
-                  colors={[
-                    'rgba(2,0,36,1)',
-                    'rgba(9,9,121,1)',
-                    'rgba(0,212,255,1)',
-                  ]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={[
-                    styles.button,
-                    {
-                      borderWidth: 1,
-                      borderTopColor: '#4485ff',
-                      borderLeftColor: '#4485ff',
-                      borderRightColor: '#4485ff',
-                      borderBottomColor: '#97cbf7',
-                    },
-                  ]}
-                >
-                  <Text style={styles.buttonText}>Continue</Text>
-                </LinearGradient>
-              )}
+              {/* {isLoading ? (
+                <ActivityIndicator size="small" color="yellow" />
+              ) : ( */}
+              <LinearGradient
+                colors={[
+                  'rgba(2,0,36,1)',
+                  'rgba(9,9,121,1)',
+                  'rgba(0,212,255,1)',
+                ]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={[
+                  styles.button,
+                  {
+                    borderWidth: 1,
+                    borderTopColor: '#4485ff',
+                    borderLeftColor: '#4485ff',
+                    borderRightColor: '#4485ff',
+                    borderBottomColor: '#97cbf7',
+                  },
+                ]}
+              >
+                <Text style={styles.buttonText}>Continue</Text>
+              </LinearGradient>
+              {/* )} */}
             </TouchableOpacity>
           </Animated.View>
         </View>
@@ -334,6 +330,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
+    bottom: 23,
   },
   buttonText: {
     color: 'white',

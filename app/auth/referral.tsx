@@ -155,16 +155,13 @@ const ReferralScreen = () => {
 
     try {
       setIsLoading(true);
-      await user?.update({
-        unsafeMetadata: {
-          gender_chosen: true,
-          referral_complete: true,
-          chosen_age: false,
-          onboarding_completed: false,
-        },
-      });
+      const currentState = await AsyncStorage.getItem('onboardingState');
+      const newState = {
+        ...(currentState ? JSON.parse(currentState) : {}),
+        referral_complete: true,
+      };
+      await AsyncStorage.setItem('onboardingState', JSON.stringify(newState));
 
-      await user?.reload();
       router.push('/auth/age');
     } catch (error: any) {
       console.error('Error updating user:', error);
@@ -203,7 +200,7 @@ const ReferralScreen = () => {
                   });
 
                   // Navigate to the choose-gender screen
-                  router.push('/auth/choose-gender');
+                  router.back();
                 } catch (error) {
                   console.error('Error updating user metadata:', error);
                 }
@@ -252,33 +249,33 @@ const ReferralScreen = () => {
               onPress={handleSubmit(onSubmit)}
               disabled={isLoading}
             >
-              {isLoading ? (
+              {/* {isLoading ? (
                 <ActivityIndicator size="small" color="white" />
-              ) : (
-                <LinearGradient
-                  colors={[
-                    'rgba(2,0,36,1)',
-                    'rgba(9,9,121,1)',
-                    'rgba(0,212,255,1)',
-                  ]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={[
-                    styles.button,
-                    {
-                      borderWidth: 1,
-                      borderTopColor: '#4485ff',
-                      borderLeftColor: '#4485ff',
-                      borderRightColor: '#4485ff',
-                      borderBottomColor: '#97cbf7',
-                    },
-                  ]}
-                >
-                  <Text style={styles.buttonText}>
-                    {isReferralComplete ? 'Continue' : 'Skip'}
-                  </Text>
-                </LinearGradient>
-              )}
+              ) : ( */}
+              <LinearGradient
+                colors={[
+                  'rgba(2,0,36,1)',
+                  'rgba(9,9,121,1)',
+                  'rgba(0,212,255,1)',
+                ]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={[
+                  styles.button,
+                  {
+                    borderWidth: 1,
+                    borderTopColor: '#4485ff',
+                    borderLeftColor: '#4485ff',
+                    borderRightColor: '#4485ff',
+                    borderBottomColor: '#97cbf7',
+                  },
+                ]}
+              >
+                <Text style={styles.buttonText}>
+                  {isReferralComplete ? 'Continue' : 'Skip'}
+                </Text>
+              </LinearGradient>
+              {/* )} */}
             </TouchableOpacity>
           </Animated.View>
         </View>
@@ -339,6 +336,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
+    // bottom: 23,
   },
   buttonText: {
     color: 'white',
@@ -360,7 +358,4 @@ const styles = StyleSheet.create({
     fontWeight: 'semibold',
   },
 });
-
-function uuidv4(): string | null {
-  throw new Error('Function not implemented.');
-}
+import { v4 as uuidv4 } from 'uuid';
