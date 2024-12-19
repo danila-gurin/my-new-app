@@ -44,7 +44,7 @@ export default function RootLayout() {
     ...DarkTheme,
     colors: {
       ...DarkTheme.colors,
-      background: '#333333', // Set your custom dark background color
+      background: '#080815', // Set your custom dark background color
     },
   };
 
@@ -52,7 +52,7 @@ export default function RootLayout() {
     ...DefaultTheme,
     colors: {
       ...DefaultTheme.colors,
-      background: '#ffffff', // Set your custom light background color
+      background: '#080815', // Set your custom light background color
     },
   };
 

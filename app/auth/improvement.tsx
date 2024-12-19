@@ -24,6 +24,7 @@ import {
   where,
 } from 'firebase/firestore';
 import { db } from '@/firebase';
+import { Ionicons } from '@expo/vector-icons';
 
 const ImprovementScreen = () => {
   const { user, isLoaded } = useUser();
@@ -140,6 +141,32 @@ const ImprovementScreen = () => {
       >
         {/* Heading Section */}
         <View style={styles.headingContainer}>
+          <TouchableOpacity
+            style={styles.goBackButton}
+            onPress={async () => {
+              try {
+                // Update user's metadata
+                user?.update({
+                  unsafeMetadata: {
+                    gender_chosen: true,
+                    referral: false,
+                  },
+                });
+
+                // Navigate to the choose-gender screen
+                router.back();
+              } catch (error) {
+                console.error('Error updating user metadata:', error);
+              }
+            }}
+          >
+            {' '}
+            <Ionicons
+              name="arrow-back-outline"
+              color="#4485ff"
+              size={35}
+            ></Ionicons>
+          </TouchableOpacity>
           <ProgressLineWithCircles currentStep={4} />
           <Text style={styles.label}>
             Which area do you{'\n'}seek improvement in?
@@ -303,6 +330,20 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'semibold',
     fontSize: 18,
+  },
+  goBackButton: {
+    position: 'absolute',
+    left: 0,
+    top: 13,
+    borderWidth: 1, // Adding border width
+    backgroundColor: '#383d45', // Define the color of the border
+    borderRadius: 50, // Optional: To make it rounded, adjust as needed
+    padding: 5, // Optional: Adjust padding for better appearance
+  },
+  goBackText: {
+    color: '#3f4857',
+    fontSize: 16,
+    fontWeight: 'semibold',
   },
 });
 function uuidv4(): string | null {

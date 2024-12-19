@@ -5,7 +5,7 @@ import { useAuth, useUser } from '@clerk/clerk-expo';
 
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { useCameraContext } from '@/components/CameraContext';
+// import { useCameraContext } from '@/components/CameraContext';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -20,15 +20,17 @@ export default function TabLayout() {
     return <Redirect href="/auth" />;
   }
 
-  const { cameraActive } = useCameraContext();
+  // const { cameraActive } = useCameraContext();
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: Colors[colorScheme ?? 'dark'].tint,
         headerShown: false,
         tabBarStyle: {
-          display: cameraActive ? 'none' : 'flex',
+          backgroundColor: colorScheme === 'dark' ? '#080815' : '#080815', // Change tab bar background color
+          borderTopWidth: 0,
+          // display: cameraActive ? 'none' : 'flex',
           ...Platform.select({
             ios: {
               position: 'absolute',
@@ -53,14 +55,16 @@ export default function TabLayout() {
         options={{
           title: 'Scan',
           tabBarIcon: ({ color }) => (
-            <Ionicons size={28} name="camera" color={color} />
+            <Ionicons size={28} name="camera-outline" color={color} />
           ),
           tabBarStyle: {
-            display: cameraActive ? 'none' : 'flex',
+            // display: cameraActive ? 'none' : 'flex',
             position: Platform.select({
               ios: 'absolute',
               default: undefined,
             }),
+            borderTopWidth: 0,
+            backgroundColor: colorScheme === 'dark' ? '#080815' : '#080815',
           },
         }}
       />

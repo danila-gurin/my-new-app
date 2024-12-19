@@ -101,12 +101,11 @@ const NotificationScreen = () => {
     }
   }
 
-  const handleOptionSelect = (option: string) => {
-    setSelectedOption(option);
-  };
-
   const handleNotificationSetup = async () => {
     await registerForPushNotificationsAsync();
+  };
+
+  const handleContinue = async () => {
     handleSubmit(onSubmit)();
   };
 
@@ -157,6 +156,7 @@ const NotificationScreen = () => {
           <TouchableOpacity
             style={[styles.button, { opacity: isLoading ? 0.7 : 1 }]}
             disabled={isLoading}
+            onPress={handleContinue}
           >
             {isLoading ? (
               <ActivityIndicator size="small" color="white" />

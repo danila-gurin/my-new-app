@@ -1,6 +1,5 @@
-import React from 'react';
-import { View, StyleSheet, Text } from 'react-native';
-import * as Progress from 'react-native-progress';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, Text, Animated } from 'react-native';
 
 type Step = {
   label: string;
@@ -20,21 +19,37 @@ const ProgressLineWithCircles = ({ currentStep = 0 }) => {
     { label: '', completed: currentStep >= 8 },
   ];
 
-  const progress = (currentStep - 1) / (steps.length - 1); // Normalized progress (0 to 1)
+  // Adjust the progress to push the filled line back by one step
+  const progress = (currentStep - 1) / (steps.length - 1); // Shift the progress by 1 step
+
+  const [animatedProgress] = useState(new Animated.Value(progress));
+
+  useEffect(() => {
+    Animated.timing(animatedProgress, {
+      toValue: progress,
+      duration: 300,
+      useNativeDriver: false, // React Native's animated transitions
+    }).start();
+  }, [progress, animatedProgress]);
 
   return (
     <View style={styles.container}>
-      {/* Progress Line */}
+      {/* Progress Line Container */}
       <View style={styles.progressContainer}>
-        <Progress.Bar
-          progress={progress}
-          width={null}
-          height={4}
-          borderRadius={4}
-          borderWidth={0}
-          color="#4485ff"
-          unfilledColor="#636161"
-          style={styles.progressBar}
+        {/* Unfilled Background Line */}
+        <View style={styles.unfilledLine} />
+
+        {/* Animated Filled Line */}
+        <Animated.View
+          style={[
+            styles.progressBar,
+            {
+              width: animatedProgress.interpolate({
+                inputRange: [0, 1],
+                outputRange: ['0%', '100%'], // Smoothly transition from 0 to 100%
+              }),
+            },
+          ]}
         />
 
         {/* Circles */}
@@ -67,14 +82,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   progressContainer: {
-    width: '100%',
+    width: '80%',
+    left: 20,
     position: 'relative',
   },
+  // Unfilled Line Style
+  unfilledLine: {
+    height: 4,
+    top: 15,
+    backgroundColor: '#636161',
+    borderRadius: 4,
+  },
+  // Progress Bar Style
   progressBar: {
     position: 'absolute',
-    top: 12, // Align with the center of circles
+    top: 15, // Align with the unfilled line
     left: 0,
-    right: 0,
+    height: 4,
+    backgroundColor: '#4485ff',
+    borderRadius: 4,
   },
   circlesContainer: {
     flexDirection: 'row',

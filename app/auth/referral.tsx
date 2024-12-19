@@ -7,10 +7,7 @@ import {
   View,
   Keyboard,
   TouchableWithoutFeedback,
-  KeyboardAvoidingView,
-  Platform,
   Animated,
-  Dimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useForm } from 'react-hook-form';
@@ -20,6 +17,14 @@ import { useEffect, useState, useRef } from 'react';
 import ProgressLineWithCircles from '@/components/ProgressBarWithCircles';
 import React from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
+import {
+  createStaticNavigation,
+  useNavigation,
+} from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { Button } from '@react-navigation/elements';
+
 import {
   addDoc,
   collection,
@@ -40,6 +45,7 @@ const ReferralScreen = () => {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const inputRef = useRef<TextInput>(null);
+  const navigation = useNavigation();
 
   // Animation value for button container
   const buttonAnimation = useRef(new Animated.Value(0)).current;
@@ -183,8 +189,32 @@ const ReferralScreen = () => {
             },
           ]}
         >
-          {/* Fixed Header Section */}
+          {/* Header with Go Back Button */}
           <View style={styles.headerSection}>
+            <TouchableOpacity
+              style={styles.goBackButton}
+              onPress={async () => {
+                try {
+                  // Update user's metadata
+                  await user?.update({
+                    unsafeMetadata: {
+                      gender_chosen: false,
+                    },
+                  });
+
+                  // Navigate to the choose-gender screen
+                  router.push('/auth/choose-gender');
+                } catch (error) {
+                  console.error('Error updating user metadata:', error);
+                }
+              }}
+            >
+              <Ionicons
+                name="arrow-back-outline"
+                color="#4485ff"
+                size={35}
+              ></Ionicons>
+            </TouchableOpacity>
             <View style={styles.headingContainer}>
               <ProgressLineWithCircles currentStep={2} />
               <Text style={styles.label}>
@@ -315,7 +345,22 @@ const styles = StyleSheet.create({
     fontWeight: 'semibold',
     fontSize: 18,
   },
+  goBackButton: {
+    position: 'absolute',
+    left: 0,
+    top: 13,
+    borderWidth: 1, // Adding border width
+    backgroundColor: '#383d45', // Define the color of the border
+    borderRadius: 50, // Optional: To make it rounded, adjust as needed
+    padding: 5, // Optional: Adjust padding for better appearance
+  },
+  goBackText: {
+    color: '#3f4857',
+    fontSize: 16,
+    fontWeight: 'semibold',
+  },
 });
+
 function uuidv4(): string | null {
   throw new Error('Function not implemented.');
 }

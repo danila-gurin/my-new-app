@@ -28,12 +28,14 @@ import {
   where,
 } from 'firebase/firestore';
 import { db } from '@/firebase';
+import { Ionicons } from '@expo/vector-icons';
 
 const AgeScreen = () => {
   const { user, isLoaded } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const inputRef = useRef<TextInput>(null);
   const [age, setAge] = useState('');
+  const [invalidAge, setInvalidAge] = useState(false);
 
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -73,6 +75,7 @@ const AgeScreen = () => {
     const { age } = data;
     if (!age || isNaN(Number(age)) || Number(age) <= 0 || Number(age) > 120) {
       console.log('invalid age');
+      setInvalidAge(true);
       return;
     }
     const tempId = await getTempId();
@@ -184,6 +187,30 @@ const AgeScreen = () => {
         >
           {/* Fixed Header Section */}
           <View style={styles.headerSection}>
+            <TouchableOpacity
+              style={styles.goBackButton}
+              onPress={async () => {
+                try {
+                  // Update user's metadata
+                  await user?.update({
+                    unsafeMetadata: {
+                      referral: false,
+                    },
+                  });
+
+                  // Navigate to the choose-gender screen
+                  router.push('/auth/referral');
+                } catch (error) {
+                  console.error('Error updating user metadata:', error);
+                }
+              }}
+            >
+              <Ionicons
+                name="arrow-back-outline"
+                color="#4485ff"
+                size={35}
+              ></Ionicons>
+            </TouchableOpacity>
             <View style={styles.headingContainer}>
               <ProgressLineWithCircles currentStep={3} />
               <Text style={styles.label}>Enter your Age</Text>
@@ -201,7 +228,9 @@ const AgeScreen = () => {
                 keyboardType="numeric"
               />
               <Text style={styles.description}>
-                Enter the number here, then continue
+                {invalidAge
+                  ? 'Invalid age entered...'
+                  : 'Enter the number here, then continue'}
               </Text>
             </View>
           </View>
@@ -310,6 +339,20 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'semibold',
     fontSize: 18,
+  },
+  goBackButton: {
+    position: 'absolute',
+    left: 0,
+    top: 13,
+    borderWidth: 1, // Adding border width
+    backgroundColor: '#383d45', // Define the color of the border
+    borderRadius: 50, // Optional: To make it rounded, adjust as needed
+    padding: 5, // Optional: Adjust padding for better appearance
+  },
+  goBackText: {
+    color: '#3f4857',
+    fontSize: 16,
+    fontWeight: 'semibold',
   },
 });
 function uuidv4(): string | null {

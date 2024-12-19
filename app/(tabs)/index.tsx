@@ -17,7 +17,7 @@ const HomeScreen = () => {
   addDocument();
   return (
     <View style={styles.container}>
-      <Text>HomeScreen</Text>
+      <Text style={{ color: 'white' }}>HomeScreen</Text>
     </View>
   );
 };
