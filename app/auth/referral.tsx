@@ -36,6 +36,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/firebase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+// import AnimatedPage from '@/components/AnimatedPage';
 
 const ReferralScreen = () => {
   const { user, isLoaded } = useUser();
@@ -176,6 +177,7 @@ const ReferralScreen = () => {
 
   return (
     <View style={styles.keyboardAvoidingView}>
+      {/* <AnimatedPage> */}
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View
           style={[
@@ -188,7 +190,7 @@ const ReferralScreen = () => {
         >
           {/* Header with Go Back Button */}
           <View style={styles.headerSection}>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={styles.goBackButton}
               onPress={async () => {
                 try {
@@ -211,7 +213,7 @@ const ReferralScreen = () => {
                 color="#4485ff"
                 size={35}
               ></Ionicons>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <View style={styles.headingContainer}>
               <ProgressLineWithCircles currentStep={2} />
               <Text style={styles.label}>
@@ -280,6 +282,7 @@ const ReferralScreen = () => {
           </Animated.View>
         </View>
       </TouchableWithoutFeedback>
+      {/* </AnimatedPage> */}
     </View>
   );
 };

@@ -156,7 +156,7 @@ const ChooseGenderScreen = () => {
     >
       {/* Heading Section */}
       <View style={styles.headingContainer}>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={styles.goBackButton}
           disabled={true}
           onPress={async () => {
@@ -186,7 +186,7 @@ const ChooseGenderScreen = () => {
             color="#4485ff"
             size={35}
           ></Ionicons>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <ProgressLineWithCircles currentStep={1} />
         <Text style={styles.label}>Choose{'\n'}your gender</Text>
       </View>

@@ -37,7 +37,7 @@ const AuthScreen = () => {
       ]}
     >
       <View style={styles.headingContainer}>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={styles.goBackButton}
           onPress={async () => {
             try {
@@ -66,7 +66,7 @@ const AuthScreen = () => {
             color="#4485ff"
             size={35}
           ></Ionicons>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <ProgressLineWithCircles currentStep={9} />
         <Text style={styles.label}>Login on Hairmax AI</Text>
         <Text style={styles.description}>

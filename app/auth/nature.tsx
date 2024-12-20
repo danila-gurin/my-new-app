@@ -137,7 +137,7 @@ const NatureScreen = () => {
       >
         {/* Heading Section */}
         <View style={styles.headingContainer}>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.goBackButton}
             onPress={async () => {
               try {
@@ -166,7 +166,7 @@ const NatureScreen = () => {
               color="#4485ff"
               size={35}
             ></Ionicons>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <ProgressLineWithCircles currentStep={7} />
           <Text style={styles.label}>Pick your{'\n'}scalp's nature</Text>
         </View>
@@ -179,7 +179,13 @@ const NatureScreen = () => {
               {
                 opacity: isLoading ? 0.7 : 1,
                 backgroundColor:
-                  selectedOption === 'Dry' ? '#4485ff' : '#141a2a',
+                  selectedOption === 'Dry' ? '#1b2948' : '#141a2a',
+                borderColor: selectedOption === 'Dry' ? '#4485ff' : '#4c515d',
+                shadowColor: selectedOption === 'Dry' ? '#4485ff' : '#141a2a', // Highlight when selected
+                shadowOpacity: 1, // Adjust for intensity
+                shadowRadius: 8, // Spread of the glow
+                shadowOffset: { width: 0, height: 0 }, // No offset for a glow
+                elevation: selectedOption === 'Dry' ? 10 : 0, // For Android
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 alignItems: 'center',
@@ -194,7 +200,7 @@ const NatureScreen = () => {
             <Ionicons
               name="checkmark-circle-outline"
               size={24}
-              color={selectedOption === 'Dry' ? '#1ae84a' : '#A9A9A9'}
+              color={selectedOption === 'Dry' ? '#4485ff' : '#A9A9A9'}
               style={{ flexShrink: 0 }}
             />
           </TouchableOpacity>
@@ -204,7 +210,15 @@ const NatureScreen = () => {
               {
                 opacity: isLoading ? 0.7 : 1,
                 backgroundColor:
-                  selectedOption === 'Normal' ? '#4485ff' : '#141a2a',
+                  selectedOption === 'Normal' ? '#1b2948' : '#141a2a',
+                borderColor:
+                  selectedOption === 'Normal' ? '#4485ff' : '#4c515d',
+                shadowColor:
+                  selectedOption === 'Normal' ? '#4485ff' : '#141a2a', // Highlight when selected
+                shadowOpacity: 1, // Adjust for intensity
+                shadowRadius: 8, // Spread of the glow
+                shadowOffset: { width: 0, height: 0 }, // No offset for a glow
+                elevation: selectedOption === 'Normal' ? 10 : 0, // For Android
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 alignItems: 'center',
@@ -220,7 +234,7 @@ const NatureScreen = () => {
             <Ionicons
               name="checkmark-circle-outline"
               size={24}
-              color={selectedOption === 'normal' ? '#1ae84a' : '#A9A9A9'}
+              color={selectedOption === 'Normal' ? '#4485ff' : '#A9A9A9'}
               style={{ flexShrink: 0 }}
             />
           </TouchableOpacity>
@@ -230,7 +244,13 @@ const NatureScreen = () => {
               {
                 opacity: isLoading ? 0.7 : 1,
                 backgroundColor:
-                  selectedOption === 'oily' ? '#4485ff' : '#141a2a',
+                  selectedOption === 'oily' ? '#1b2948' : '#141a2a',
+                borderColor: selectedOption === 'oily' ? '#4485ff' : '#4c515d',
+                shadowColor: selectedOption === 'oily' ? '#4485ff' : '#141a2a', // Highlight when selected
+                shadowOpacity: 1, // Adjust for intensity
+                shadowRadius: 8, // Spread of the glow
+                shadowOffset: { width: 0, height: 0 }, // No offset for a glow
+                elevation: selectedOption === 'oily' ? 10 : 0, // For Android
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 alignItems: 'center',
@@ -245,7 +265,7 @@ const NatureScreen = () => {
             <Ionicons
               name="checkmark-circle-outline"
               size={24}
-              color={selectedOption === 'oily' ? '#1ae84a' : '#A9A9A9'}
+              color={selectedOption === 'oily' ? '#4485ff' : '#A9A9A9'}
               style={{ flexShrink: 0 }}
             />
           </TouchableOpacity>
@@ -255,7 +275,15 @@ const NatureScreen = () => {
               {
                 opacity: isLoading ? 0.7 : 1,
                 backgroundColor:
-                  selectedOption === 'undetermined' ? '#4485ff' : '#141a2a',
+                  selectedOption === 'undetermined' ? '#1b2948' : '#141a2a',
+                borderColor:
+                  selectedOption === 'undetermined' ? '#4485ff' : '#4c515d',
+                shadowColor:
+                  selectedOption === 'undetermined' ? '#4485ff' : '#141a2a', // Highlight when selected
+                shadowOpacity: 1, // Adjust for intensity
+                shadowRadius: 8, // Spread of the glow
+                shadowOffset: { width: 0, height: 0 }, // No offset for a glow
+                elevation: selectedOption === 'undetermined' ? 10 : 0, // For Android
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 alignItems: 'center',
@@ -270,7 +298,7 @@ const NatureScreen = () => {
             <Ionicons
               name="checkmark-circle-outline"
               size={24}
-              color={selectedOption === 'undetermined' ? '#1ae84a' : '#A9A9A9'}
+              color={selectedOption === 'undetermined' ? '#4485ff' : '#A9A9A9'}
               style={{ flexShrink: 0 }}
             />
           </TouchableOpacity>

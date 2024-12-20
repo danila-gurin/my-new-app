@@ -83,8 +83,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   progressContainer: {
-    width: '80%',
-    left: 20,
+    width: '100%',
+    // left: 20,
     position: 'relative',
   },
   // Unfilled Line Style
@@ -113,9 +113,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   circle: {
-    width: 18,
-    height: 18,
-    top: 4,
+    width: 15,
+    height: 15,
+    top: 5,
     borderRadius: 12,
     backgroundColor: '#636161',
     borderWidth: 2,

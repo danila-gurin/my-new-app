@@ -124,7 +124,7 @@ const NotificationScreen = () => {
       >
         {/* Heading Section */}
         <View style={styles.headingContainer}>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.goBackButton}
             onPress={async () => {
               try {
@@ -153,7 +153,7 @@ const NotificationScreen = () => {
               color="#4485ff"
               size={35}
             ></Ionicons>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <ProgressLineWithCircles currentStep={8} />
           <Text style={styles.label}>Enable Notifications</Text>
         </View>
@@ -234,10 +234,10 @@ const styles = StyleSheet.create({
     height: 250,
     borderRadius: 800,
     backgroundColor: '#161d2e',
-    shadowColor: '#ffffff',
-    shadowOffset: { width: 0, height: 20 },
-    shadowOpacity: 0.4,
-    shadowRadius: 20,
+    shadowColor: '#4485ff',
+    shadowOffset: { width: 2, height: 10 },
+    shadowOpacity: 0.6,
+    shadowRadius: 5,
     elevation: 5,
     justifyContent: 'center',
     alignItems: 'center',

@@ -129,7 +129,7 @@ const WashScreen = () => {
       >
         {/* Heading Section */}
         <View style={styles.headingContainer}>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.goBackButton}
             onPress={async () => {
               try {
@@ -158,7 +158,7 @@ const WashScreen = () => {
               color="#4485ff"
               size={35}
             ></Ionicons>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <ProgressLineWithCircles currentStep={5} />
           <Text style={styles.label}>
             How frequently do you{'\n'}wash your hair?
@@ -173,7 +173,15 @@ const WashScreen = () => {
               {
                 opacity: isLoading ? 0.7 : 1,
                 backgroundColor:
+                  selectedOption === 'every day' ? '#1b2948' : '#141a2a',
+                borderColor:
+                  selectedOption === 'every day' ? '#4485ff' : '#4c515d',
+                shadowColor:
                   selectedOption === 'every day' ? '#4485ff' : '#141a2a', // Highlight when selected
+                shadowOpacity: 1, // Adjust for intensity
+                shadowRadius: 8, // Spread of the glow
+                shadowOffset: { width: 0, height: 0 }, // No offset for a glow
+                elevation: selectedOption === 'every day' ? 10 : 0, // For Android
                 flexDirection: 'row', // Align text and icon horizontally
                 justifyContent: 'space-between', // Keep text left, icon right
                 alignItems: 'center', // Center vertically
@@ -186,7 +194,7 @@ const WashScreen = () => {
             <Ionicons
               name="checkmark-circle-outline"
               size={24}
-              color={selectedOption === 'every day' ? '#1ae84a' : '#A9A9A9'}
+              color={selectedOption === 'every day' ? '#4485ff' : '#A9A9A9'}
               style={{ flexShrink: 0 }} // Prevent icon from resizing
             />
           </TouchableOpacity>
@@ -196,7 +204,15 @@ const WashScreen = () => {
               {
                 opacity: isLoading ? 0.7 : 1,
                 backgroundColor:
+                  selectedOption === 'every other day' ? '#1b2948' : '#141a2a',
+                borderColor:
+                  selectedOption === 'every other day' ? '#4485ff' : '#4c515d',
+                shadowColor:
                   selectedOption === 'every other day' ? '#4485ff' : '#141a2a', // Highlight when selected
+                shadowOpacity: 1, // Adjust for intensity
+                shadowRadius: 8, // Spread of the glow
+                shadowOffset: { width: 0, height: 0 }, // No offset for a glow
+                elevation: selectedOption === 'every other day' ? 10 : 0, // For Android
                 flexDirection: 'row', // Align text and icon horizontally
                 justifyContent: 'space-between', // Keep text left, icon right
                 alignItems: 'center', // Center vertically
@@ -210,7 +226,7 @@ const WashScreen = () => {
               name="checkmark-circle-outline"
               size={24}
               color={
-                selectedOption === 'every other day' ? '#1ae84a' : '#A9A9A9'
+                selectedOption === 'every other day' ? '#4485ff' : '#A9A9A9'
               }
               style={{ flexShrink: 0 }} // Prevent icon from resizing
             />
@@ -221,7 +237,15 @@ const WashScreen = () => {
               {
                 opacity: isLoading ? 0.7 : 1,
                 backgroundColor:
+                  selectedOption === '2-3 times a week' ? '#1b2948' : '#141a2a',
+                borderColor:
+                  selectedOption === '2-3 times a week' ? '#4485ff' : '#4c515d',
+                shadowColor:
                   selectedOption === '2-3 times a week' ? '#4485ff' : '#141a2a', // Highlight when selected
+                shadowOpacity: 1, // Adjust for intensity
+                shadowRadius: 8, // Spread of the glow
+                shadowOffset: { width: 0, height: 0 }, // No offset for a glow
+                elevation: selectedOption === '2-3 times a week' ? 10 : 0, // For Android
                 flexDirection: 'row', // Align text and icon horizontally
                 justifyContent: 'space-between', // Keep text left, icon right
                 alignItems: 'center', // Center vertically
@@ -235,7 +259,7 @@ const WashScreen = () => {
               name="checkmark-circle-outline"
               size={24}
               color={
-                selectedOption === '2-3 times a week' ? '#1ae84a' : '#A9A9A9'
+                selectedOption === '2-3 times a week' ? '#4485ff' : '#A9A9A9'
               }
               style={{ flexShrink: 0 }} // Prevent icon from resizing
             />
@@ -246,7 +270,15 @@ const WashScreen = () => {
               {
                 opacity: isLoading ? 0.7 : 1,
                 backgroundColor:
+                  selectedOption === 'once a week' ? '#1b2948' : '#141a2a',
+                borderColor:
+                  selectedOption === 'once a week' ? '#4485ff' : '#4c515d',
+                shadowColor:
                   selectedOption === 'once a week' ? '#4485ff' : '#141a2a', // Highlight when selected
+                shadowOpacity: 1, // Adjust for intensity
+                shadowRadius: 8, // Spread of the glow
+                shadowOffset: { width: 0, height: 0 }, // No offset for a glow
+                elevation: selectedOption === 'once a week' ? 10 : 0, // For Android
                 flexDirection: 'row', // Align text and icon horizontally
                 justifyContent: 'space-between', // Keep text left, icon right
                 alignItems: 'center', // Center vertically
@@ -259,7 +291,7 @@ const WashScreen = () => {
             <Ionicons
               name="checkmark-circle-outline"
               size={24}
-              color={selectedOption === 'once a week' ? '#1ae84a' : '#A9A9A9'}
+              color={selectedOption === 'once a week' ? '#4485ff' : '#A9A9A9'}
               style={{ flexShrink: 0 }} // Prevent icon from resizing
             />
           </TouchableOpacity>

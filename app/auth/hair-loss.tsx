@@ -140,7 +140,7 @@ const HairLossScreen = () => {
       >
         {/* Heading Section */}
         <View style={styles.headingContainer}>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.goBackButton}
             onPress={async () => {
               try {
@@ -169,7 +169,7 @@ const HairLossScreen = () => {
               color="#4485ff"
               size={35}
             ></Ionicons>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <ProgressLineWithCircles currentStep={6} />
           <Text style={styles.label}>Any family{'\n'}hair loss history?</Text>
         </View>
@@ -182,7 +182,15 @@ const HairLossScreen = () => {
               {
                 opacity: isLoading ? 0.7 : 1,
                 backgroundColor:
-                  selectedOption === 'extreme' ? '#4485ff' : '#141a2a',
+                  selectedOption === 'extreme' ? '#1b2948' : '#141a2a',
+                borderColor:
+                  selectedOption === 'extreme' ? '#4485ff' : '#4c515d',
+                shadowColor:
+                  selectedOption === 'extreme' ? '#4485ff' : '#141a2a', // Highlight when selected
+                shadowOpacity: 1, // Adjust for intensity
+                shadowRadius: 8, // Spread of the glow
+                shadowOffset: { width: 0, height: 0 }, // No offset for a glow
+                elevation: selectedOption === 'extreme' ? 10 : 0, // For Android
                 flexDirection: 'row', // Align text and icon horizontally
                 justifyContent: 'space-between', // Keep text left, icon right
                 alignItems: 'center', // Center vertically
@@ -197,7 +205,7 @@ const HairLossScreen = () => {
             <Ionicons
               name="checkmark-circle-outline"
               size={24}
-              color={selectedOption === 'extreme' ? '#1ae84a' : '#A9A9A9'}
+              color={selectedOption === 'extreme' ? '#4485ff' : '#A9A9A9'}
               style={{ flexShrink: 0 }} // Prevent icon from resizing
             />
           </TouchableOpacity>
@@ -207,7 +215,15 @@ const HairLossScreen = () => {
               {
                 opacity: isLoading ? 0.7 : 1,
                 backgroundColor:
-                  selectedOption === 'moderate' ? '#4485ff' : '#141a2a',
+                  selectedOption === 'moderate' ? '#1b2948' : '#141a2a',
+                borderColor:
+                  selectedOption === 'moderate' ? '#4485ff' : '#4c515d',
+                shadowColor:
+                  selectedOption === 'moderate' ? '#4485ff' : '#141a2a', // Highlight when selected
+                shadowOpacity: 1, // Adjust for intensity
+                shadowRadius: 8, // Spread of the glow
+                shadowOffset: { width: 0, height: 0 }, // No offset for a glow
+                elevation: selectedOption === 'moderate' ? 10 : 0, // For Android
                 flexDirection: 'row', // Align text and icon horizontally
                 justifyContent: 'space-between', // Keep text left, icon right
                 alignItems: 'center', // Center vertically
@@ -223,7 +239,7 @@ const HairLossScreen = () => {
             <Ionicons
               name="checkmark-circle-outline"
               size={24}
-              color={selectedOption === 'moderate' ? '#1ae84a' : '#A9A9A9'}
+              color={selectedOption === 'moderate' ? '#4485ff' : '#A9A9A9'}
               style={{ flexShrink: 0 }} // Prevent icon from resizing
             />
           </TouchableOpacity>
@@ -233,7 +249,13 @@ const HairLossScreen = () => {
               {
                 opacity: isLoading ? 0.7 : 1,
                 backgroundColor:
-                  selectedOption === 'none' ? '#4485ff' : '#141a2a',
+                  selectedOption === 'none' ? '#1b2948' : '#141a2a',
+                borderColor: selectedOption === 'none' ? '#4485ff' : '#4c515d',
+                shadowColor: selectedOption === 'none' ? '#4485ff' : '#141a2a', // Highlight when selected
+                shadowOpacity: 1, // Adjust for intensity
+                shadowRadius: 8, // Spread of the glow
+                shadowOffset: { width: 0, height: 0 }, // No offset for a glow
+                elevation: selectedOption === 'none' ? 10 : 0, // For Android
                 flexDirection: 'row', // Align text and icon horizontally
                 justifyContent: 'space-between', // Keep text left, icon right
                 alignItems: 'center', // Center vertically
@@ -248,7 +270,7 @@ const HairLossScreen = () => {
             <Ionicons
               name="checkmark-circle-outline"
               size={24}
-              color={selectedOption === 'none' ? '#1ae84a' : '#A9A9A9'}
+              color={selectedOption === 'none' ? '#4485ff' : '#A9A9A9'}
               style={{ flexShrink: 0 }} // Prevent icon from resizing
             />
           </TouchableOpacity>

@@ -14,6 +14,8 @@ import Referral from './referral';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const Stack = createNativeStackNavigator();
+import PageTransitionWrapper from '../../components/AnimatedPage';
+import { NavigationContainer } from '@react-navigation/native';
 
 export default function AuthLayout() {
   const { user } = useUser();
@@ -179,7 +181,18 @@ export default function AuthLayout() {
   // if (onboardingCompleted)
   // Default Stack for Onboarding Screens
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+      screenOptions={{
+        animation: 'fade', // or 'slide_from_left', 'fade', etc.
+        headerShown: false, // optional, if you don't want headers
+        contentStyle: {
+          backgroundColor: 'white', // or any color you prefer
+        },
+        // You can add custom animations using the following props
+        animationTypeForReplace: 'push',
+        animationDuration: 100,
+      }}
+    >
       <Stack.Screen
         name="choose-gender"
         options={{ headerShown: false }}

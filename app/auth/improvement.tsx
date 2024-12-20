@@ -31,7 +31,7 @@ const ImprovementScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   // Change selected options state to an array
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+  const [selectedOption, setSelectedOption] = useState<string>('');
 
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -52,7 +52,7 @@ const ImprovementScreen = () => {
 
   // Submit Handler
   const onSubmit = async () => {
-    const improvementChoices = selectedOptions; // Use the selected options state for improvement choices
+    const improvementChoices = selectedOption; // Use the selected options state for improvement choices
     const tempId = await getTempId();
 
     async function addDocument() {
@@ -111,14 +111,7 @@ const ImprovementScreen = () => {
 
   // Handler for selecting an option
   const handleOptionSelect = (option: string) => {
-    setSelectedOptions((prevState) => {
-      // Check if the option is already selected, if it is, remove it, otherwise add it
-      if (prevState.includes(option)) {
-        return prevState.filter((item) => item !== option); // Remove option
-      } else {
-        return [...prevState, option]; // Add option
-      }
-    });
+    setSelectedOption(option); // Set the selected option to only one value
   };
 
   return (
@@ -135,7 +128,7 @@ const ImprovementScreen = () => {
       >
         {/* Heading Section */}
         <View style={styles.headingContainer}>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.goBackButton}
             onPress={async () => {
               try {
@@ -164,7 +157,7 @@ const ImprovementScreen = () => {
               color="#4485ff"
               size={35}
             ></Ionicons>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <ProgressLineWithCircles currentStep={4} />
           <Text style={styles.label}>
             Which area do you{'\n'}seek improvement in?
@@ -178,9 +171,19 @@ const ImprovementScreen = () => {
               styles.radioButton,
               {
                 opacity: isLoading ? 0.7 : 1,
-                backgroundColor: selectedOptions.includes('style')
+                backgroundColor: selectedOption.includes('style')
+                  ? '#1b2948'
+                  : '#141a2a',
+                borderColor: selectedOption.includes('style')
+                  ? '#4485ff'
+                  : '#4c515d',
+                shadowColor: selectedOption.includes('style')
                   ? '#4485ff'
                   : '#141a2a', // Highlight when selected
+                shadowOpacity: 1, // Adjust for intensity
+                shadowRadius: 8, // Spread of the glow
+                shadowOffset: { width: 0, height: 0 }, // No offset for a glow
+                elevation: selectedOption.includes('style') ? 10 : 0, // For Android
                 height: 64,
                 flexDirection: 'row', // Align text and icon horizontally
                 justifyContent: 'space-between', // Keep text left, icon right
@@ -194,7 +197,7 @@ const ImprovementScreen = () => {
             <Ionicons
               name="checkmark-circle-outline"
               size={24}
-              color={selectedOptions.includes('style') ? '#1ae84a' : '#A9A9A9'}
+              color={selectedOption.includes('style') ? '#4485ff' : '#A9A9A9'}
               style={{ flexShrink: 0 }} // Prevent icon from resizing
             />
           </TouchableOpacity>
@@ -203,9 +206,20 @@ const ImprovementScreen = () => {
               styles.radioButton,
               {
                 opacity: isLoading ? 0.7 : 1,
-                backgroundColor: selectedOptions.includes('health')
+                backgroundColor: selectedOption.includes('health')
+                  ? '#1b2948'
+                  : '#141a2a',
+                borderColor: selectedOption.includes('health')
+                  ? '#4485ff'
+                  : '#4c515d',
+                shadowColor: selectedOption.includes('health')
                   ? '#4485ff'
                   : '#141a2a', // Highlight when selected
+                shadowOpacity: 1, // Adjust for intensity
+                shadowRadius: 8, // Spread of the glow
+                shadowOffset: { width: 0, height: 0 }, // No offset for a glow
+                elevation: selectedOption.includes('health') ? 10 : 0, // For Android
+
                 height: 64,
                 flexDirection: 'row', // Align text and icon horizontally
                 justifyContent: 'space-between', // Keep text left, icon right
@@ -219,7 +233,7 @@ const ImprovementScreen = () => {
             <Ionicons
               name="checkmark-circle-outline"
               size={24}
-              color={selectedOptions.includes('health') ? '#1ae84a' : '#A9A9A9'}
+              color={selectedOption.includes('health') ? '#4485ff' : '#A9A9A9'}
               style={{ flexShrink: 0 }} // Prevent icon from resizing
             />
           </TouchableOpacity>
@@ -228,9 +242,20 @@ const ImprovementScreen = () => {
               styles.radioButton,
               {
                 opacity: isLoading ? 0.7 : 1,
-                backgroundColor: selectedOptions.includes('loss')
+                backgroundColor: selectedOption.includes('loss')
+                  ? '#1b2948'
+                  : '#141a2a',
+                borderColor: selectedOption.includes('loss')
+                  ? '#4485ff'
+                  : '#4c515d',
+                shadowColor: selectedOption.includes('loss')
                   ? '#4485ff'
                   : '#141a2a', // Highlight when selected
+                shadowOpacity: 1, // Adjust for intensity
+                shadowRadius: 8, // Spread of the glow
+                shadowOffset: { width: 0, height: 0 }, // No offset for a glow
+                elevation: selectedOption.includes('loss') ? 10 : 0, // For Android
+
                 height: 64,
                 flexDirection: 'row', // Align text and icon horizontally
                 justifyContent: 'space-between', // Keep text left, icon right
@@ -244,7 +269,7 @@ const ImprovementScreen = () => {
             <Ionicons
               name="checkmark-circle-outline"
               size={24}
-              color={selectedOptions.includes('loss') ? '#1ae84a' : '#A9A9A9'}
+              color={selectedOption.includes('loss') ? '#4485ff' : '#A9A9A9'}
               style={{ flexShrink: 0 }} // Prevent icon from resizing
             />
           </TouchableOpacity>
@@ -254,7 +279,7 @@ const ImprovementScreen = () => {
             <TouchableOpacity
               style={[styles.button, { opacity: isLoading ? 0.7 : 1 }]}
               onPress={onSubmit} // Use the updated onSubmit handler
-              disabled={isLoading || selectedOptions.length === 0}
+              disabled={isLoading || selectedOption.length === 0}
             >
               {/* {isLoading ? (
                 <ActivityIndicator size="small" color="white" />

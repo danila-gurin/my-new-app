@@ -183,7 +183,7 @@ const AgeScreen = () => {
         >
           {/* Fixed Header Section */}
           <View style={styles.headerSection}>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={styles.goBackButton}
               onPress={async () => {
                 try {
@@ -206,7 +206,7 @@ const AgeScreen = () => {
                 color="#4485ff"
                 size={35}
               ></Ionicons>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <View style={styles.headingContainer}>
               <ProgressLineWithCircles currentStep={3} />
               <Text style={styles.label}>Enter your Age</Text>
